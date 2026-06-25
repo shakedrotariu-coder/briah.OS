@@ -197,6 +197,81 @@ textarea{resize:vertical;min-height:100px;line-height:1.6}
 .text-muted{color:var(--brown-100);font-size:13px}
 .text-sm{font-size:13px}.fw-500{font-weight:500}
 .intake-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+
+/* CHIPS */
+.chips-grid{display:flex;flex-wrap:wrap;gap:8px}
+.chip{cursor:pointer}
+.chip input{display:none}
+.chip span{
+  display:inline-block;padding:7px 14px;border-radius:999px;
+  border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;
+  font-size:13px;color:#634734;transition:all .15s;
+}
+.chip input:checked + span{
+  border-color:#a3502e;background:rgba(163,80,46,.08);
+  color:#a3502e;font-weight:500;
+}
+.chip span:hover{border-color:#a3a877}
+
+/* MASHLUL CARDS */
+.mashlul-card{cursor:pointer;display:block}
+.mashlul-card input{display:none}
+.mashlul-content{
+  border:1.5px solid rgba(99,71,52,.15);border-radius:18px;
+  padding:16px 20px;background:#fffaf0;transition:all .15s;margin-bottom:0;
+}
+.mashlul-card input:checked + .mashlul-content{
+  border-color:#a3502e;background:rgba(163,80,46,.05);
+  box-shadow:0 0 0 3px rgba(163,80,46,.1);
+}
+.mashlul-name{font-weight:600;color:#634734;margin-bottom:4px}
+.mashlul-desc{font-size:13px;color:#8c6b54;line-height:1.6}
+
+/* STEP HEADER */
+.step-header{margin-bottom:1.5rem}
+.step-label{font-size:12px;color:#b89a83;margin-bottom:6px}
+
+/* ONBOARDING CARD */
+.onboarding-card{
+  max-width:580px;margin:0 auto;
+  background:#fffaf0;border-radius:28px;
+  padding:2rem 2rem 2.5rem;
+  box-shadow:0 6px 18px -8px rgba(99,71,52,.18);
+}
+.step-emoji{font-size:2rem;margin-bottom:12px;display:block}
+.step-title{
+  font-family:"Frank Ruhl Libre",Georgia,serif;
+  font-size:1.6rem;font-weight:400;color:#634734;
+  margin-bottom:6px;
+}
+.step-desc{font-size:14px;color:#8c6b54;margin-bottom:1.5rem}
+
+/* REFLECTION SECTIONS */
+.section-card{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(99,71,52,.1)}
+.section-num{font-size:11px;font-weight:600;letter-spacing:.15em;color:#b89a83;margin-bottom:4px}
+.scale-row{margin-bottom:16px}
+.scale-stmt{font-size:14px;color:#634734;margin-bottom:8px}
+.scale-5{display:flex;gap:8px}
+.scale-opt{cursor:pointer}
+.scale-opt input{display:none}
+.scale-opt span{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;
+  font-size:13px;color:#634734;transition:all .15s;
+}
+.scale-opt input:checked + span{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:600}
+.scale-5.horizontal{justify-content:space-between}
+.scale-opt-lg{cursor:pointer;flex:1}
+.scale-opt-lg input{display:none}
+.scale-opt-lg span.num{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:44px;border-radius:14px;
+  border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;
+  font-size:15px;color:#634734;transition:all .15s;
+}
+.scale-opt-lg input:checked + span.num{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:600}
+.scale-ends-row{display:flex;justify-content:space-between;font-size:11px;color:#b89a83;margin-top:6px}
 </style>
 </head>
 <body>

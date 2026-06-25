@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שלב 3 מתוך 5 · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--sage:#cbc6a9;--clay-100:#e8c9b3;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);min-height:100vh;padding:2rem 1rem;}
+h3{font-family:var(--font-display);font-weight:400}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+.btn-full{width:100%}
+.field-group{margin-bottom:1.25rem}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--brown-200);margin-bottom:6px}
+textarea{
+  width:100%;padding:12px 16px;border:1px solid rgba(99,71,52,.2);border-radius:18px;
+  background:var(--cream-50);color:var(--brown);font-family:var(--font-body);font-size:15px;outline:none;resize:vertical;
+}
+textarea:focus{border-color:rgba(163,80,46,.5);box-shadow:0 0 0 3px rgba(163,80,46,.08)}
+.progress-wrap{background:rgba(99,71,52,.1);border-radius:999px;height:4px;overflow:hidden}
+.progress-bar{height:100%;background:var(--terracotta);transition:width .3s}
+
+.step-header{margin-bottom:1.5rem;max-width:580px;margin-inline:auto}
+.step-label{font-size:12px;color:#b89a83;margin-bottom:6px}
+.onboarding-card{
+  max-width:580px;margin:0 auto;background:#fffaf0;border-radius:28px;
+  padding:2rem 2rem 2.5rem;box-shadow:0 6px 18px -8px rgba(99,71,52,.18);
+}
+.step-emoji{font-size:2rem;margin-bottom:12px;display:block}
+.step-title{font-family:"Frank Ruhl Libre",Georgia,serif;font-size:1.6rem;font-weight:400;color:#634734;margin-bottom:6px}
+.step-desc{font-size:14px;color:#8c6b54;margin-bottom:1.5rem}
+
+.chips-grid{display:flex;flex-wrap:wrap;gap:8px}
+.chip{cursor:pointer}
+.chip input{display:none}
+.chip span{display:inline-block;padding:7px 14px;border-radius:999px;border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;font-size:13px;color:#634734;transition:all .15s}
+.chip input:checked + span{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:500}
+.chip span:hover{border-color:#a3a877}
+</style>
+</head>
+<body>
+
+<div class="step-header">
+  <div class="step-label">שלב 3 מתוך 5 · מה נוגע בך</div>
+  <div class="progress-wrap">
+    <div class="progress-bar" style="width:60%;"></div>
+  </div>
+</div>
+
+<div class="onboarding-card">
+  <div class="step-emoji">🌊</div>
+  <h3 class="step-title">מה נוגע בך — ומה פחות</h3>
+  <p class="step-desc">נרצה להתאים לך מרחב שמרגיש נכון</p>
+
+  <form method="POST" action="/onboarding/step/3/{{ token }}">
+
+    <div class="field-group">
+      <label class="field-label">מה לרוב עוזר לך בתקופות מאתגרות?</label>
+      <textarea name="what_helps" rows="3"
+                placeholder="לדוגמה: לקרוא, לנוע, לדבר עם מישהו, להיות בים..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">אילו מרחבים הכי מסקרנים או מושכים אותך?</label>
+      <p style="font-size:12px; color:#b89a83; margin-bottom:10px;">
+        אפשר לסמן כמה — גם אם לא ניסית
+      </p>
+      <div class="chips-grid">
+        {% for opt in [
+          'יוגה סומטית', 'ריברסינג', 'אקסטטיק דאנס', 'סאונד הילינג',
+          'ביטוי קולי', 'נשימה / Breathwork', 'מדיטציה / דמיון מודרך',
+          'כתיבה אינטגרטיבית', 'מרחב טקסי', 'הרצאות'
+        ] %}
+        <label class="chip">
+          <input type="checkbox" name="interests" value="{{ opt }}">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">מה יכול להקשות עלייך לאורך התהליך?</label>
+      <p style="font-size:12px; color:#b89a83; margin-bottom:8px;">
+        (לוז, מרחק, קושי בהתמדה, מרחב קבוצתי — כל מה שחשוב לנו לדעת)
+      </p>
+      <textarea name="challenges" rows="3"
+                placeholder="אין תשובה שגויה — ידיעה זו תעזור לנו לתמוך בך טוב יותר..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">האם היצא לך להתנסות בעבר בטיפול / סדנה?</label>
+      <p style="font-size:12px; color:#b89a83; margin-bottom:8px;">
+        אם יש חוויה שתמכה — נשמח לשמוע. ואם יש משהו שדווקא לא מתאים לך — חשוב שנדע!
+      </p>
+      <textarea name="past_experience" rows="3"
+                placeholder="שתפי אותנו מה עבד, מה פחות, ואם יש סדנה שמרתיעה אותך — אנחנו כאן לשמוע..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">
+        האם יש סדנה שאת ממש לא מעוניינת בה?
+        <span style="font-size:12px; color:#b89a83;">(לא חייבת, אבל חשוב לנו לדעת)</span>
+      </label>
+      <textarea name="not_interested" rows="2"
+                placeholder="לדוגמה: 'אני ממש לא מתחברת לנשימות בקבוצה'..."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">המשך → העדפות טיפול אישי</button>
+  </form>
+</div>
+</body>
+</html>

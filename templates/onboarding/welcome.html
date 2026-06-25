@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בריאה · ברוכה הבאה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--sage:#cbc6a9;--clay-100:#e8c9b3;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+.btn-full{width:100%}
+
+.welcome-page{
+  min-height:100vh;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem 1rem;
+}
+.welcome-card{
+  max-width:520px;width:100%;
+  background:#fffaf0;
+  border-radius:32px;
+  padding:3rem 2.5rem;
+  box-shadow:0 20px 50px -20px rgba(99,71,52,.25);
+  text-align:center;
+}
+.briah-logo{font-family:"Frank Ruhl Libre",Georgia,serif;font-size:2.8rem;font-weight:400;color:#634734;margin-bottom:4px}
+.briah-tagline{font-size:14px;color:#8c6b54;margin-bottom:2.5rem;letter-spacing:.03em}
+.welcome-greeting{font-family:"Frank Ruhl Libre",Georgia,serif;font-size:1.6rem;font-weight:400;color:#634734;margin-bottom:1rem;line-height:1.4}
+.welcome-text{font-size:15px;color:#8c6b54;line-height:1.9;margin-bottom:2rem}
+.steps-preview{display:flex;gap:8px;justify-content:center;margin-bottom:2.5rem}
+.step-dot{width:32px;height:4px;border-radius:999px;background:rgba(99,71,52,.15)}
+.step-dot.active{background:#a3502e}
+.time-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(163,168,119,.15);color:#634734;border-radius:999px;padding:6px 14px;font-size:13px;margin-bottom:1.5rem}
+</style>
+</head>
+<body>
+<div class="welcome-page">
+  <div class="welcome-card">
+
+    <div class="briah-logo">בריא.ה</div>
+    <div class="briah-tagline">מעטפת לחיים עצמם</div>
+
+    <div class="steps-preview">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <div class="time-badge">⏱ כ-10 דקות · 5 שלבים קצרים</div>
+
+    <div class="welcome-greeting">
+      שלום {{ lakoach.full_name }} 🤍<br>
+      שמחים שהגעת.
+    </div>
+
+    <p class="welcome-text">
+      לפני שמתחילים את המסע המשותף,<br>
+      אנחנו רוצים להכיר אותך —<br>
+      לא בשאלון ארוך ומייגע,<br>
+      אלא ב-5 שיחות קצרות ואמיתיות.
+    </p>
+
+    <p class="welcome-text" style="font-size:13px; color:#b89a83;">
+      אין תשובות נכונות.<br>
+      מה שתכתבי כאן יעזור לנו לבנות<br>
+      את המסלול המדויק ביותר עבורך.
+    </p>
+
+    <a href="/onboarding/step/1/{{ token }}" class="btn btn-primary btn-full">
+      בואי נתחיל →
+    </a>
+
+    <p style="margin-top:1.5rem; font-size:12px; color:#b89a83;">
+      אפשר לשמור ולחזור אחר כך — אנחנו שומרים את הנקודה שבה עצרת
+    </p>
+
+  </div>
+</div>
+</body>
+</html>
