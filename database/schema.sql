@@ -72,6 +72,7 @@ CREATE TABLE sessions (
   scheduled_at    timestamptz,
   sikum           text,          -- סיכום קצר מהמטפל
   degashim        text,          -- דגשים להעברה לצוות
+  session_number  integer,       -- מספר הפגישה הסידורי עם המטפל הזה
   status          text DEFAULT 'scheduled',
   created_at      timestamptz DEFAULT now()
 );

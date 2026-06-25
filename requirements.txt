@@ -1,6 +1,7 @@
 flask
 supabase
 anthropic
+openai
 twilio
 python-dotenv
 gunicorn

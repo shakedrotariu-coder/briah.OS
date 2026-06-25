@@ -1,13 +1,17 @@
 import json
 import logging
+import os
+import tempfile
 from datetime import datetime, timezone
 from functools import wraps
 
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, session
 
 from agents.tochnit_agent import build_tochnit
-from agents.transcription_agent import extract_intake_from_transcript
+from agents.transcription_agent import extract_intake_from_transcript, transcribe_audio
 from routes.auth import login_required
+from services.email_service import send_assessment_results
+from services.pdf_service import generate_tochnit_pdf
 from services.supabase_client import supabase
 
 melave_bp = Blueprint("melave", __name__, url_prefix="/melave")
@@ -151,10 +155,10 @@ def process_intake(lakoach_id):
 
     if "audio_file" in request.files and request.files["audio_file"].filename:
         f = request.files["audio_file"]
-        path = f"/tmp/intake_{lakoach_id}.txt"
+        ext = os.path.splitext(f.filename)[1] or ".mp3"
+        path = os.path.join(tempfile.gettempdir(), f"intake_{lakoach_id}{ext}")
         f.save(path)
-        with open(path, "r", encoding="utf-8") as fp:
-            transcript = fp.read()
+        transcript = transcribe_audio(path)
 
     if not transcript:
         return jsonify({"error": "no transcript"}), 400
@@ -286,15 +290,66 @@ def save_tochnit(lakoach_id):
 @login_required
 @_melave_only
 def send_tochnit(lakoach_id):
-    if supabase is not None:
-        try:
-            supabase.table("tochniyot_ishiyot").update({
-                "sent_at": datetime.now(timezone.utc).isoformat(),
-            }).eq("lakoach_id", lakoach_id).execute()
-        except Exception:
-            logger.exception("Failed to send tochnit for %s", lakoach_id)
-            flash("שליחת התוכנית נכשלה", "error")
-            return redirect(f"/melave/tochnit/{lakoach_id}")
+    if supabase is None:
+        flash("התוכנית נשלחה ללקוח ולבריאה (מצב פיתוח — אין Supabase)", "success")
+        return redirect("/melave")
 
-    flash("התוכנית נשלחה ללקוח ולבריאה", "success")
+    try:
+        lakoach = supabase.table("users").select("*").eq("id", lakoach_id).single().execute().data or {}
+
+        tochnit_res = (
+            supabase.table("tochniyot_ishiyot")
+            .select("*")
+            .eq("lakoach_id", lakoach_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        tochnit_row = tochnit_res.data[0] if tochnit_res.data else {}
+
+        intake_res = (
+            supabase.table("intakes")
+            .select("ai_assessment")
+            .eq("lakoach_id", lakoach_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        ai_result = intake_res.data[0].get("ai_assessment") if intake_res.data else {}
+        ai_result = ai_result or {}
+
+        pdf_bytes = generate_tochnit_pdf(
+            lakoach_name=lakoach.get("full_name", ""),
+            tochnit=tochnit_row,
+            ai_result=ai_result,
+        )
+
+        assessment_html = f"""
+        <div style="background:#fff0db;padding:20px;border-radius:16px;margin:20px 0;direction:rtl;">
+          <strong style="color:#634734;">Resilience Score: {ai_result.get('resilience_score', '—')}/100</strong>
+          <p style="color:#8c6b54;margin-top:8px;">{ai_result.get('summary_he', '')}</p>
+          <p style="color:#634734;margin-top:12px;">התוכנית האישית שלך מצורפת כ-PDF 🌿</p>
+        </div>
+        """
+
+        email_sent = send_assessment_results(
+            to_email=lakoach.get("email", ""),
+            full_name=lakoach.get("full_name", ""),
+            assessment_html=assessment_html,
+            pdf_bytes=pdf_bytes if pdf_bytes else None,
+        )
+
+        supabase.table("tochniyot_ishiyot").update({
+            "sent_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("lakoach_id", lakoach_id).execute()
+
+        if email_sent:
+            flash(f"התוכנית נשלחה ל-{lakoach.get('email')} עם PDF מצורף ✓", "success")
+        else:
+            flash("התוכנית סומנה כנשלחה — המייל לא נשלח (בדקי הגדרות SMTP)", "info")
+    except Exception as e:
+        logger.exception("Failed to send tochnit for %s", lakoach_id)
+        flash(f"שגיאה בשליחה: {str(e)[:80]}", "error")
+        return redirect(f"/melave/tochnit/{lakoach_id}")
+
     return redirect("/melave")

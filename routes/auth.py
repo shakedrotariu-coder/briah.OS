@@ -1,9 +1,12 @@
 import logging
+import os
 from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from services.supabase_client import supabase
+
+_MOCK_LOGIN_ALLOWED = os.getenv("FLASK_ENV") == "development" or os.getenv("ALLOW_MOCK_LOGIN") == "1"
 
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
@@ -67,9 +70,12 @@ def login():
         except Exception:
             logger.exception("Supabase login failed for %s", email)
 
-    if user is None and email in _MOCK_USERS:
-        # Development fallback: any password accepted for the seeded mock emails.
+    used_mock = False
+    if user is None and _MOCK_LOGIN_ALLOWED and email in _MOCK_USERS:
+        # Development-only fallback: any password accepted for the seeded mock emails.
+        # Gated by FLASK_ENV=development or ALLOW_MOCK_LOGIN=1 — never falls back in production.
         user = _MOCK_USERS[email]
+        used_mock = True
 
     if user is None:
         flash("שם משתמש או סיסמה שגויים", "error")
@@ -79,6 +85,9 @@ def login():
     session["role"] = user["role"]
     session["full_name"] = user["full_name"]
     session["email"] = email
+
+    if used_mock:
+        flash("⚠️ התחברות דמה — מצב פיתוח", "info")
 
     return redirect(_ROLE_HOME.get(user["role"], "/login"))
 

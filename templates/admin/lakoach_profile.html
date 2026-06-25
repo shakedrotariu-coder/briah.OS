@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ lakoach.full_name }} · ניהול{% endblock %}
+{% block content %}
+
+<div class="flex-between mb-4">
+  <div>
+    <div class="eyebrow mb-1">פרופיל לקוחה</div>
+    <h2>{{ lakoach.full_name }}</h2>
+    <p class="text-muted">{{ lakoach.email }} · {{ lakoach.phone or 'אין טלפון' }}</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/shibutz/{{ lakoach.id }}" class="btn btn-secondary btn-sm">ערוך שיבוץ</a>
+    <a href="/admin" class="btn btn-ghost btn-sm">← חזרה</a>
+  </div>
+</div>
+
+<div class="grid-2 mb-3">
+  <div class="card">
+    <h4 class="section-title">פרטי תהליך</h4>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="flex-between">
+        <span class="text-muted">מסלול</span>
+        <span class="badge badge-olive">{{ profile.mashlul or '—' }}</span>
+      </div>
+      <div class="flex-between">
+        <span class="text-muted">תאריך התחלה</span>
+        <span>{{ profile.start_date or '—' }}</span>
+      </div>
+      <div class="flex-between">
+        <span class="text-muted">מלווה</span>
+        <span>{{ melave.full_name if melave else 'לא שובץ' }}</span>
+      </div>
+      <div class="flex-between">
+        <span class="text-muted">מטפל 1:1</span>
+        <span>{{ metapel.full_name if metapel else 'לא שובץ' }}</span>
+      </div>
+      <div class="flex-between">
+        <span class="text-muted">Resilience Score</span>
+        <span class="fw-500">{{ score or '—' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 class="section-title">Assessment</h4>
+    {% if breakdown %}
+    {% for layer, name in [('karakoa','קרקוע'),('preka','פריקה'),
+                            ('integrazia','אינטגרציה'),('kehila','קהילה'),('mashmaut','משמעות')] %}
+    <div class="mb-2">
+      <div class="flex-between mb-1">
+        <span class="text-sm">{{ name }}</span>
+        <span class="text-sm text-muted">{{ breakdown.get(layer, 0) }}%</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" style="width:{{ breakdown.get(layer, 0) }}%"></div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-muted">אינטייק טרם הושלם</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if tochnit %}
+<div class="card mb-3">
+  <h4 class="section-title">תוכנית אישית</h4>
+  <div class="grid-3">
+    {% for tzir in ['tzir_1', 'tzir_2', 'tzir_3'] %}
+    {% if tochnit.get(tzir) %}
+    <div class="card-olive">
+      <div class="fw-500">{{ tochnit[tzir] }}</div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% if tochnit.sent_at %}
+  <p class="text-muted mt-2" style="font-size:12px;">נשלח: {{ tochnit.sent_at[:10] }}</p>
+  {% else %}
+  <p class="text-muted mt-2" style="font-size:12px;color:#EF9F27;">טרם נשלח ללקוחה</p>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h4 class="section-title">פגישות</h4>
+  {% if sessions %}
+  <table class="data-table">
+    <thead><tr><th>תאריך</th><th>סטטוס</th><th>סיכום</th></tr></thead>
+    <tbody>
+    {% for s in sessions %}
+    <tr>
+      <td>{{ s.scheduled_at[:10] if s.scheduled_at else '—' }}</td>
+      <td><span class="badge badge-olive">{{ s.status }}</span></td>
+      <td class="text-muted">{{ s.sikum|default('—') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted">אין פגישות רשומות</p>
+  {% endif %}
+</div>
+
+{% endblock %}

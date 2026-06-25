@@ -103,7 +103,10 @@ def webhook():
 def send_checkins():
     """Internal endpoint — send daily check-ins to all active users."""
     secret = request.headers.get("X-Internal-Secret", "")
-    if secret != os.getenv("INTERNAL_SECRET", "briah-internal"):
+    internal_secret = os.getenv("INTERNAL_SECRET", "")
+    if not internal_secret:
+        return {"error": "INTERNAL_SECRET not configured"}, 500
+    if secret != internal_secret:
         return {"error": "unauthorized"}, 401
 
     if supabase is None:

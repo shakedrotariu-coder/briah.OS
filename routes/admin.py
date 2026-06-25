@@ -124,6 +124,102 @@ def create_lakoach():
     return redirect("/admin")
 
 
+@admin_bp.route("/lakoach/<lakoach_id>")
+@login_required
+@_admin_only
+def lakoach_profile(lakoach_id):
+    lakoach = {"id": lakoach_id, "full_name": "לקוח דמה", "email": "", "phone": ""}
+    profile = {}
+    intake_row = None
+    tochnit_row = None
+    melave_row = None
+    metapel_row = None
+    sessions_list = []
+    score = 0
+    breakdown = {}
+    strengths = []
+
+    if supabase is not None:
+        try:
+            lakoach = supabase.table("users").select("*").eq("id", lakoach_id).single().execute().data
+            profile = (
+                supabase.table("lakoach_profiles").select("*").eq("user_id", lakoach_id).single().execute().data
+                or {}
+            )
+
+            intake_res = (
+                supabase.table("intakes")
+                .select("*")
+                .eq("lakoach_id", lakoach_id)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            intake_row = intake_res.data[0] if intake_res.data else None
+
+            tochnit_res = (
+                supabase.table("tochniyot_ishiyot")
+                .select("*")
+                .eq("lakoach_id", lakoach_id)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            tochnit_row = tochnit_res.data[0] if tochnit_res.data else None
+
+            if profile.get("melave_id"):
+                melave_row = (
+                    supabase.table("users")
+                    .select("full_name, email, phone")
+                    .eq("id", profile["melave_id"])
+                    .single()
+                    .execute()
+                    .data
+                )
+            if profile.get("metapel_id"):
+                metapel_row = (
+                    supabase.table("users")
+                    .select("full_name, email, phone")
+                    .eq("id", profile["metapel_id"])
+                    .single()
+                    .execute()
+                    .data
+                )
+
+            sessions_list = (
+                supabase.table("sessions")
+                .select("*")
+                .eq("lakoach_id", lakoach_id)
+                .order("scheduled_at", desc=True)
+                .limit(5)
+                .execute()
+                .data
+                or []
+            )
+
+            ai_result = intake_row.get("ai_assessment") if intake_row else {} or {}
+            score = ai_result.get("resilience_score", 0)
+            breakdown = ai_result.get("breakdown", {})
+            strengths = ai_result.get("strengths", [])
+        except Exception:
+            logger.exception("Failed to load admin profile for %s", lakoach_id)
+            flash("שגיאה בטעינת הפרופיל — מוצגים נתוני דמה", "error")
+
+    return render_template(
+        "admin/lakoach_profile.html",
+        lakoach=lakoach,
+        profile=profile,
+        intake=intake_row,
+        tochnit=tochnit_row,
+        melave=melave_row,
+        metapel=metapel_row,
+        sessions=sessions_list,
+        score=score,
+        breakdown=breakdown,
+        strengths=strengths,
+    )
+
+
 @admin_bp.route("/shibutz/<lakoach_id>", methods=["GET"])
 @login_required
 @_admin_only
