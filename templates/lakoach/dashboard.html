@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>המסע שלי · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--sage:#cbc6a9;--clay-100:#e8c9b3;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--shadow-md:0 6px 18px -8px rgba(99,71,52,.18),0 2px 4px rgba(99,71,52,.05);
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{
+  font-family:var(--font-body);font-size:16px;color:var(--brown);
+  background:linear-gradient(90deg,#cbc6a9 0%,#fff0db 100%);
+  background-attachment:fixed;min-height:100vh;-webkit-font-smoothing:antialiased;
+  padding:2rem 1.5rem;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:400;color:var(--brown);line-height:1.15}
+h1{font-size:2rem}h3{font-size:1.3rem}h4{font-size:1.1rem;font-weight:500}
+p{line-height:1.75}
+a{color:var(--terracotta);text-decoration:none}
+.page-container{max-width:980px;margin:0 auto}
+
+.topbar{display:flex;justify-content:flex-end;margin-bottom:1.5rem}
+.topbar a{color:var(--brown-200);font-size:13px}
+
+.card{background:var(--cream-50);border:1px solid rgba(99,71,52,.12);border-radius:28px;padding:2rem;box-shadow:var(--shadow-md)}
+.card-brown{background:var(--brown);border-radius:28px;padding:2rem;color:var(--cream)}
+.card-brown h1,.card-brown h2,.card-brown h3,.card-brown p{color:var(--cream)}
+.card-olive{background:rgba(163,168,119,.18);border:1px solid rgba(163,168,119,.35);border-radius:28px;padding:2rem}
+
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.badge-cream{background:var(--clay-100);color:var(--brown)}
+
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;transition:background .2s,color .2s;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover);color:var(--cream)}
+
+.score-circle{width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--terracotta) calc(var(--pct,0)*1%),rgba(255,240,219,.35) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.score-inner{width:76px;height:76px;border-radius:50%;background:var(--brown);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.6rem;color:var(--cream)}
+
+.progress-wrap{background:rgba(99,71,52,.1);border-radius:999px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:999px;background:var(--terracotta);transition:width .5s}
+
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+.axis-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:10px}
+.axis-karakoa{background:rgba(203,198,169,.4)}
+.axis-preka{background:rgba(163,80,46,.12)}
+.axis-integrazia{background:rgba(163,168,119,.2)}
+.axis-kehila{background:var(--clay-100)}
+.axis-mashmaut{background:rgba(99,71,52,.1)}
+
+.cal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.cal-day-header{font-size:11px;font-weight:600;text-align:center;color:var(--brown-100);padding:6px 0}
+.cal-slot{background:var(--cream-50);border:1px solid rgba(99,71,52,.1);border-radius:12px;padding:8px;font-size:12px;min-height:70px}
+.cal-slot-time{color:var(--brown-100);font-size:10px;margin-bottom:3px}
+.cal-slot-name{font-weight:600;color:var(--brown)}
+.cal-slot-facilitator{color:var(--brown-200);font-size:11px}
+.cal-karakoa{border-right:3px solid var(--sage)}
+.cal-preka{border-right:3px solid var(--terracotta)}
+.cal-integrazia{border-right:3px solid var(--clay-100)}
+.cal-kehila{border-right:3px solid var(--olive)}
+.cal-mashmaut{border-right:3px solid var(--brown-200)}
+
+.avatar-lg{width:52px;height:52px;border-radius:50%;background:var(--clay-100);color:var(--brown);font-weight:600;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.flex{display:flex}.flex-center{display:flex;align-items:center}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.gap-1{gap:.5rem}.gap-2{gap:1rem}
+.mb-1{margin-bottom:.5rem}.mb-2{margin-bottom:1rem}.mb-3{margin-bottom:1.5rem}.mb-4{margin-bottom:2rem}
+.mt-3{margin-top:1.5rem}
+.text-muted{color:var(--brown-100);font-size:13px}
+.fw-500{font-weight:500}
+
+@media(max-width:768px){.grid-3{grid-template-columns:1fr}.cal-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="page-container">
+
+  <div class="topbar"><a href="/logout">יציאה</a></div>
+
+  <div class="card-brown mb-4">
+    <h1>שלום {{ lakoach.full_name }} 🌿</h1>
+    <p style="font-size:13px;opacity:.8;margin-bottom:1rem;">יום {{ day_num }} במסע שלך בבריאה</p>
+    <div class="flex-center gap-2">
+      <div class="score-circle" style="--pct: {{ score }};">
+        <div class="score-inner">{{ score }}</div>
+      </div>
+      <div class="flex" style="flex-wrap:wrap; gap:8px;">
+        <span class="badge badge-cream">
+          {% if journey_type == 'gentle' %}מסלול עדין
+          {% elif journey_type == 'intensive' %}מסלול אינטנסיבי
+          {% else %}מסלול מתון
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mb-2">התוכנית האישית שלך</h3>
+  <div class="grid-3 mb-4">
+    {% set axes = [
+      (tochnit.tzir_1 if tochnit else 'קרקוע', 'karakoa', '🌱'),
+      (tochnit.tzir_2 if tochnit else 'פריקה', 'preka', '🌊'),
+      (tochnit.tzir_3 if tochnit else 'אינטגרציה', 'integrazia', '🤍')
+    ] %}
+    {% for axis_name, axis_layer, icon in axes %}
+    <div class="card">
+      <div class="axis-icon axis-{{ axis_layer }}">{{ icon }}</div>
+      <h4 class="mb-1">{{ axis_name }}</h4>
+      <p class="text-muted mb-2">{{ breakdown.get(axis_layer, 0) }}% התקדמות</p>
+      <div class="progress-wrap"><div class="progress-bar" style="width: {{ breakdown.get(axis_layer, 0) }}%;"></div></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h3 class="mb-2">החודש שלך בבריאה</h3>
+  <div class="card mb-4">
+    <div class="cal-grid">
+      <div class="cal-day-header">ראשון</div>
+      <div class="cal-day-header">שני</div>
+      <div class="cal-day-header">שלישי</div>
+      <div class="cal-day-header">רביעי</div>
+      <div class="cal-day-header">חמישי</div>
+      <div class="cal-day-header">שישי</div>
+
+      {% for slot in luz %}
+      <div class="cal-slot cal-{{ slot.layer_class }}">
+        <div class="cal-slot-time">{{ slot.time }}</div>
+        <div class="cal-slot-name">{{ slot.name }}</div>
+        <div class="cal-slot-facilitator">{{ slot.facilitator }}</div>
+      </div>
+      {% else %}
+      {% for i in range(6) %}
+      <div class="cal-slot" style="opacity:.3; display:flex; align-items:center; justify-content:center; color:#b89a83; font-size:12px;">פנוי</div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <h3 class="mb-2">הצוות שלך</h3>
+  <div class="flex gap-2 mb-4" style="flex-wrap: wrap;">
+    <div class="card flex-center gap-1" style="flex: 1; min-width: 240px;">
+      <div class="avatar-lg">{{ melave.full_name[:2] if melave else '—' }}</div>
+      <div>
+        <div class="fw-500">{{ melave.full_name if melave else 'עדיין לא שובץ מלווה' }}</div>
+        <div class="text-muted">מלווה אישי — לשאלות על התהליך{% if melave and melave.phone %} · {{ melave.phone }}{% endif %}</div>
+      </div>
+    </div>
+    <div class="card flex-center gap-1" style="flex: 1; min-width: 240px;">
+      <div class="avatar-lg">{{ metapel.full_name[:2] if metapel else '—' }}</div>
+      <div>
+        <div class="fw-500">{{ metapel.full_name if metapel else 'עדיין לא שובץ מטפל' }}</div>
+        <div class="text-muted">
+          מטפל/ת 1:1 —
+          {% if next_session %}הפגישה הבאה: {{ next_session.scheduled_at }}
+          {% else %}טרם נקבעה פגישה
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-olive" style="text-align:center;">
+    <h4 class="mb-1">AI Companion — כאן בשבילך בין המפגשים 💬</h4>
+    <p class="text-muted mb-3">נוכחות חמה ותומכת, בכל זמן שתצטרכי</p>
+    <a href="/lakoach/companion" class="btn btn-primary">פתחי שיחה</a>
+  </div>
+
+</div>
+</body>
+</html>

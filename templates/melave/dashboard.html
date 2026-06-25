@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}הלקוחות שלי · מלווה{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">הלקוחות שלי</h2>
+
+{% if lakochim %}
+<div class="grid-3">
+  {% for l in lakochim %}
+  <div class="card">
+    <div class="flex-center gap-1 mb-2">
+      <div class="avatar">{{ l.full_name[:2] }}</div>
+      <div>
+        <div class="fw-500">{{ l.full_name }}</div>
+        <span class="badge badge-cream">{{ l.mashlul }}</span>
+      </div>
+    </div>
+    <div class="mb-2">
+      <span class="badge badge-{{ l.shav_class|default('warning') }}">{{ l.shav|default('אינטייק') }}</span>
+    </div>
+    <div class="text-muted mb-2">תאריך התחלה: {{ l.start_date|default('—') }}</div>
+    <a href="/melave/intake/{{ l.id }}" class="btn btn-secondary btn-sm">פתח פרופיל</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-muted" style="text-align: center; padding: 2rem 0;">עדיין אין לך לקוחות משובצים</p>
+{% endif %}
+{% endblock %}

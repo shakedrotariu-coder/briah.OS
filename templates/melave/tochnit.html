@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}תוכנית אישית — {{ lakoach.full_name }}{% endblock %}
+
+{% block content %}
+<div class="flex-between mb-3">
+  <h2>תוכנית אישית — {{ lakoach.full_name }}</h2>
+  <button type="button" id="generate-btn" class="btn btn-primary">בנה תוכנית עם AI ✨</button>
+</div>
+
+<div id="generate-status" class="flash flash-info" style="display:none;"></div>
+
+<form id="tochnit-form" method="POST" action="/melave/tochnit/{{ lakoach.id }}/save">
+
+<div class="card mb-3">
+  <div class="section-title">על מה נתמקד</div>
+  {% for i in [1, 2, 3] %}
+  <div class="field-group">
+    <label class="field-label">ציר {{ i }}</label>
+    <select name="tzir_{{ i }}" id="tzir-{{ i }}-select">
+      <option>חיבור לגוף</option>
+      <option>ויסות רגשי</option>
+      <option>מערכות יחסים</option>
+      <option>ביטחון עצמי</option>
+      <option>תנועה ויציאה מתקיעות</option>
+      <option>קרקוע</option>
+      <option>פריקה</option>
+      <option>אינטגרציה</option>
+      <option>קהילה</option>
+      <option>משמעות</option>
+    </select>
+    <textarea name="tzir_{{ i }}_text" id="tzir-{{ i }}-text" placeholder="הסבר קצר..." class="mt-2"></textarea>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card mb-3">
+  <div class="section-title">איך זה נראה בפועל</div>
+  <div id="activities-list">
+    <div class="grid-4 mb-2 text-muted text-sm">
+      <span>שם הפעילות</span><span>סוג</span><span>תדירות</span><span>איך תומך בתהליך</span>
+    </div>
+  </div>
+  <button type="button" class="btn btn-secondary btn-sm" onclick="addActivityRow()">+ הוסף פעילות</button>
+  <input type="hidden" name="paaluyot" id="paaluyot-input" value="[]">
+</div>
+
+<div class="card mb-3">
+  <div class="section-title">לוז החודש</div>
+  <div class="cal-grid">
+    <div class="cal-day-header">ראשון</div>
+    <div class="cal-day-header">שני</div>
+    <div class="cal-day-header">שלישי</div>
+    <div class="cal-day-header">רביעי</div>
+    <div class="cal-day-header">חמישי</div>
+    <div class="cal-day-header">שישי</div>
+    {% for i in range(6) %}
+    <div class="cal-slot text-muted">+ הוסף</div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="section-title">מכתב אישי ללקוח</div>
+  <textarea name="personal_letter" id="personal-letter" style="min-height: 220px;">{{ lakoach.full_name }} יקרה,
+תודה על הפתיחות והלב שהבאת לשיחת האינטייק.
+מהשיחה עלה ש___
+ובמקביל יש בך רצון עמוק ל___
+מתוך זה, בנינו עבורך את התוכנית האישית שלך בבריאה 🤍</textarea>
+</div>
+
+<div class="flex gap-1">
+  <button type="submit" class="btn btn-secondary">שמור טיוטה</button>
+  <button type="submit" formaction="/melave/tochnit/{{ lakoach.id }}/send" class="btn btn-primary">שלח ללקוח + לבריאה</button>
+</div>
+
+</form>
+
+<script>
+  function addActivityRow(values) {
+    values = values || {};
+    const list = document.getElementById('activities-list');
+    const row = document.createElement('div');
+    row.className = 'grid-4 mb-2';
+    row.innerHTML =
+      '<input type="text" class="act-name" placeholder="שם פעילות" value="' + (values.name || '') + '">' +
+      '<select class="act-type"><option>סדנה קבוצתית</option><option>טיפול 1:1</option><option>מדיטציה</option></select>' +
+      '<input type="text" class="act-freq" placeholder="תדירות" value="' + (values.tifkud || values.frequency || '') + '">' +
+      '<input type="text" class="act-support" placeholder="איך תומך בתהליך" value="' + (values.support || '') + '">';
+    list.appendChild(row);
+  }
+
+  function syncPaaluyot() {
+    const rows = document.querySelectorAll('#activities-list > div.grid-4:not(:first-child)');
+    const data = Array.from(rows).map(function (row) {
+      return {
+        name: row.querySelector('.act-name').value,
+        type: row.querySelector('.act-type').value,
+        tifkud: row.querySelector('.act-freq').value,
+        support: row.querySelector('.act-support').value,
+      };
+    });
+    document.getElementById('paaluyot-input').value = JSON.stringify(data);
+  }
+
+  document.getElementById('tochnit-form').addEventListener('submit', syncPaaluyot);
+
+  document.getElementById('generate-btn').addEventListener('click', function () {
+    const status = document.getElementById('generate-status');
+    status.style.display = 'block';
+    status.textContent = 'ה-AI בונה תוכנית אישית...';
+
+    fetch('/melave/tochnit/{{ lakoach.id }}/generate', { method: 'POST' })
+      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        const data = res.data || {};
+        status.textContent = 'התוכנית נבנתה בהצלחה ✓';
+
+        [1, 2, 3].forEach(function (i) {
+          const axis = data['tzir_' + i];
+          if (!axis) return;
+          document.getElementById('tzir-' + i + '-select').value = axis.name;
+          document.getElementById('tzir-' + i + '-text').value = axis.hesber || '';
+        });
+
+        document.getElementById('activities-list').innerHTML =
+          '<div class="grid-4 mb-2 text-muted text-sm"><span>שם הפעילות</span><span>סוג</span><span>תדירות</span><span>איך תומך בתהליך</span></div>';
+        (data.paaluyot || []).forEach(function (act) { addActivityRow(act); });
+
+        if (data.mikhtav_ishishi) {
+          document.getElementById('personal-letter').value = data.mikhtav_ishishi;
+        }
+      })
+      .catch(function () {
+        status.textContent = 'שגיאה ביצירת התוכנית — נסו שוב';
+      });
+  });
+</script>
+{% endblock %}

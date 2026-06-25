@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}סיכום פגישה — {{ lakoach.full_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">סיכום פגישה — {{ lakoach.full_name }}</h2>
+
+<div class="card" style="max-width: 640px;">
+  <form method="POST" action="/metapel/sikum/{{ lakoach.id }}">
+    <div class="grid-2">
+      <div class="field-group">
+        <label class="field-label">תאריך</label>
+        <input type="date" name="session_date" value="{{ today }}">
+      </div>
+      <div class="field-group">
+        <label class="field-label">מספר פגישה</label>
+        <input type="text" name="session_number" value="{{ session_number }}">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">סיכום קצר</label>
+      <p class="text-muted mb-1">לא לתוכן אישי עמוק — רק מה שמועיל להמשך</p>
+      <textarea name="sikum"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">דגשים לצוות</label>
+      <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="needs_grounding"> זקוקה לקרקוע</label>
+      <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="touch_sensitivity"> רגישות גבוהה למגע</label>
+      <input type="text" name="degash_extra" placeholder="דגש נוסף..." class="mt-2">
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">שמור סיכום</button>
+  </form>
+</div>
+{% endblock %}

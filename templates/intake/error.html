@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שגיאה · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--brown-200:#8c6b54;--brown-100:#b89a83;
+--terracotta:#a3502e;--cream-50:#fffaf0;
+--shadow-md:0 6px 18px -8px rgba(99,71,52,.18),0 2px 4px rgba(99,71,52,.05);
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{
+  font-family:var(--font-body);font-size:16px;color:var(--brown);
+  background:linear-gradient(90deg,#cbc6a9 0%,#fff0db 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;padding:1rem;
+}
+h1,h2{font-family:var(--font-display);font-weight:400;color:var(--brown)}
+p{line-height:1.75}
+.card{
+  background:var(--cream-50);border:1px solid rgba(99,71,52,.12);
+  border-radius:28px;padding:3rem 2.5rem;box-shadow:var(--shadow-md);
+  max-width:440px;text-align:center;
+}
+.logo{font-size:2rem;margin-bottom:4px}
+.tagline{color:var(--brown-200);font-size:14px;margin-bottom:2rem}
+.error-msg{color:var(--terracotta);font-size:16px;margin-bottom:1.5rem;line-height:1.6}
+.contact{color:var(--brown-100);font-size:13px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">בריא.ה</div>
+    <div class="tagline">מעטפת לחיים עצמם</div>
+    <p class="error-msg">{{ msg }}</p>
+    <p class="contact">פנה למלווה שלך, או כתוב לנו ל-briah@briah.co</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>התוצאות שלך · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--sage:#cbc6a9;--clay-100:#e8c9b3;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--shadow-md:0 6px 18px -8px rgba(99,71,52,.18),0 2px 4px rgba(99,71,52,.05);
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{
+  font-family:var(--font-body);font-size:16px;color:var(--brown);
+  background:linear-gradient(135deg, #cbc6a9 0%, #fff0db 60%, #f7e6cf 100%);
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+  padding:2rem 1rem;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:400;color:var(--brown);line-height:1.15}
+h1{font-size:2rem}h2{font-size:1.6rem}h3{font-size:1.2rem}
+p{line-height:1.75}
+.results-container{max-width:680px;margin:0 auto}
+
+.card{background:var(--cream-50);border:1px solid rgba(99,71,52,.12);border-radius:28px;padding:2rem;box-shadow:var(--shadow-md)}
+.card-olive{background:rgba(163,168,119,.15);border:1px solid rgba(163,168,119,.3);border-radius:28px;padding:2rem}
+.card-brown{background:var(--brown);border-radius:28px;padding:2rem;color:var(--cream)}
+.card-brown h1,.card-brown h2,.card-brown h3,.card-brown p{color:var(--cream)}
+
+.mb-3{margin-bottom:1.5rem}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brown-100);margin-bottom:6px}
+.section-title{font-family:var(--font-display);font-size:1.2rem;font-weight:500;color:var(--brown);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(99,71,52,.1)}
+.text-muted{color:var(--brown-100);font-size:13px}
+.text-sm{font-size:13px}.fw-500{font-weight:500}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.flex-center{display:flex;align-items:center}
+.gap-1{gap:.5rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+.divider{border:none;border-top:1px solid rgba(99,71,52,.1);margin:1.5rem 0}
+@media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+.progress-wrap{background:rgba(99,71,52,.1);border-radius:999px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:999px;background:var(--terracotta);transition:width .5s}
+
+.score-circle{width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--terracotta) calc(var(--pct,0)*1%),rgba(99,71,52,.1) 0);display:flex;align-items:center;justify-content:center}
+.score-inner{width:94px;height:94px;border-radius:50%;background:var(--cream-50);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:2rem;color:var(--brown)}
+
+.question-layer{display:inline-block;font-size:11px;padding:2px 10px;border-radius:999px;font-weight:500}
+.layer-karakoa{background:rgba(203,198,169,.3);color:#634734}
+.layer-preka{background:rgba(163,80,46,.1);color:#a3502e}
+.layer-integrazia{background:rgba(163,168,119,.15);color:#3B6D11}
+.layer-kehila{background:#e8c9b3;color:#634734}
+.layer-mashmaut{background:rgba(99,71,52,.1);color:#634734}
+
+.metric-card{background:var(--cream-50);border:1px solid rgba(99,71,52,.1);border-radius:18px;padding:1.25rem 1.5rem}
+</style>
+</head>
+<body>
+<div class="results-container">
+
+  <div class="card-brown mb-3" style="text-align:center; padding: 3rem;">
+    <h1>{{ lakoach.full_name }}, ה-Assessment שלך מוכן 🌿</h1>
+    <p>{{ result.summary_he }}</p>
+  </div>
+
+  <div class="card mb-3" style="text-align:center;">
+    <div class="eyebrow">Resilience Score</div>
+    <div class="score-circle" style="--pct: {{ result.resilience_score }}; margin: 1rem auto;">
+      <div class="score-inner">{{ result.resilience_score }}</div>
+    </div>
+    <p class="text-muted" style="margin-top:1rem;">
+      {% if result.resilience_score >= 70 %}חוסן גבוה — יש לך משאבים פנימיים חזקים
+      {% elif result.resilience_score >= 45 %}חוסן בינוני — יש מקום לצמיחה ועמקת שורשים
+      {% else %}חוסן בשלב התחלתי — זה בדיוק הזמן להתחיל
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="card mb-3">
+    <h3 class="section-title">חמשת המישורים שלך</h3>
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      {% for layer_key, layer_name, layer_class in [
+          ('karakoa','קרקוע','karakoa'),
+          ('preka','פריקה','preka'),
+          ('integrazia','אינטגרציה','integrazia'),
+          ('kehila','קהילה','kehila'),
+          ('mashmaut','משמעות','mashmaut')
+      ] %}
+      <div>
+        <div class="flex-between" style="margin-bottom:4px;">
+          <span class="question-layer layer-{{ layer_class }}">{{ layer_name }}</span>
+          <span class="text-sm fw-500">{{ result.breakdown[layer_key] }}%</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width: {{ result.breakdown[layer_key] }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="grid-2 mb-3">
+    <div class="card-olive">
+      <div class="eyebrow" style="margin-bottom:8px;">החוזקות שלך</div>
+      {% for s in result.strengths %}
+      <div class="flex-center gap-1" style="margin-bottom:4px;">
+        <span style="color:#639922">✓</span>
+        <span>{{ s }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">הזמנה לצמיחה</div>
+      {% for g in result.growth_areas %}
+      <div class="flex-center gap-1" style="margin-bottom:4px;">
+        <span style="color:#a3502e">🌱</span>
+        <span>{{ g }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <h3 class="section-title">הפעילויות המומלצות עבורך</h3>
+    <div class="grid-3">
+      {% for act in result.recommended_activities %}
+      <div class="metric-card" style="text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:8px;">🌿</div>
+        <div class="fw-500">{{ act }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card-brown mb-3">
+    <div class="eyebrow" style="color:rgba(255,240,219,.6); margin-bottom:12px;">מכתב אישי</div>
+    <p style="line-height:2; color:#fff0db; white-space: pre-line;">{{ result.personal_letter }}</p>
+    <p style="margin-top:1.5rem; color:rgba(255,240,219,.7); font-size:13px;">
+      בריאה — מעטפת לחיים עצמם 🤍
+    </p>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <h3 style="margin-bottom:12px;">מה הלאה?</h3>
+    <p class="text-muted mb-3">המלווה שלך קיבל את התוצאות וייצור איתך קשר בקרוב לבניית התוכנית האישית.</p>
+    <p class="text-muted mb-3">📧 שלחנו לך עותק ל-{{ lakoach.email }}</p>
+    <div class="divider"></div>
+    <p style="font-size:13px; color:#b89a83;">
+      זהו כלי היכרות — לא אבחנה רפואית. התוצאות נועדו לעזור לנו להכיר אותך טוב יותר.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

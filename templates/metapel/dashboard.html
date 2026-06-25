@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}הלקוחות שלי · מטפל{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">הלקוחות שלי</h2>
+
+<div class="grid-2">
+  <div>
+    {% if lakochim %}
+      {% for l in lakochim %}
+      <div class="card mb-2">
+        <div class="flex-between">
+          <div class="flex-center gap-1">
+            <div class="avatar">{{ l.full_name[:2] }}</div>
+            <div>
+              <div class="fw-500">{{ l.full_name }}</div>
+              <div class="text-muted">פגישה הבאה: {{ l.next_session|default('—') }}</div>
+            </div>
+          </div>
+          {% if l.needs_summary %}
+          <span class="badge badge-warning">דורש סיכום</span>
+          {% endif %}
+        </div>
+        <a href="/metapel/lakoach/{{ l.id }}" class="btn btn-secondary btn-sm mt-2">פתח פרופיל</a>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">עדיין אין לך לקוחות משובצים</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="section-title">לוז השבוע</div>
+      {% if upcoming_sessions %}
+        {% for s in upcoming_sessions %}
+        <div class="flex-between mb-2">
+          <span>{{ s.scheduled_at }} · {{ s.lakoach_name }}</span>
+          <span class="badge badge-cream">{{ s.status }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">אין פגישות מתוזמנות השבוע</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

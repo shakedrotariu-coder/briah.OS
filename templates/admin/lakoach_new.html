@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}הוספת לקוח חדש{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">הוספת לקוח חדש</h2>
+
+<div class="card" style="max-width: 560px;">
+  <form method="POST" action="/admin/lakoach">
+    <div class="field-group">
+      <label class="field-label">שם מלא</label>
+      <input type="text" name="full_name" required>
+    </div>
+    <div class="field-group">
+      <label class="field-label">מייל</label>
+      <input type="email" name="email" required dir="ltr">
+    </div>
+    <div class="field-group">
+      <label class="field-label">טלפון</label>
+      <input type="text" name="phone" dir="ltr">
+    </div>
+    <div class="field-group">
+      <label class="field-label">מסלול</label>
+      <select name="mashlul" required>
+        <option value="ikur">עוגן</option>
+        <option value="tzmiha">צמיחה</option>
+        <option value="hamakata">העמקה</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label">מלווה</label>
+      <select name="melave_id" required>
+        {% for m in melavim %}
+        <option value="{{ m.id }}">{{ m.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label">תאריך התחלה</label>
+      <input type="date" name="start_date" required>
+    </div>
+
+    <div class="flex gap-1 mt-3">
+      <a href="/admin" class="btn btn-secondary">ביטול</a>
+      <button type="submit" class="btn btn-primary">צור לקוח</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

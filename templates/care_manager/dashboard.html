@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}CRM · ניהול סיכונים{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">CRM — ניהול וסיכונים</h2>
+
+<div class="grid-4 mb-4">
+  <div class="metric-card">
+    <div class="metric-label">לקוחות פעילות</div>
+    <div class="metric-value">{{ stats.total }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">דגלי סיכון פתוחים</div>
+    <div class="metric-value" style="color:#E24B4A;">{{ stats.total_risk }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">ממוצע Resilience Score</div>
+    <div class="metric-value">{{ stats.avg_score }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">מעורבות WhatsApp (היום)</div>
+    <div class="metric-value">{{ stats.wa_engagement }}%</div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="flex-between mb-3">
+    <h3 class="section-title" style="border:none;margin:0;">כל הלקוחות</h3>
+    <a href="/admin/lakoach/new" class="btn-primary btn">+ לקוח חדש</a>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>לקוחה</th>
+        <th>Resilience Score</th>
+        <th>מסלול</th>
+        <th>סטטוס</th>
+        <th>קשר אחרון</th>
+        <th>פעולות</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in lakochim %}
+      <tr onclick="location.href='/care-manager/{{ l.id }}'">
+        <td>
+          <div class="flex-center gap-1">
+            <span class="status-dot status-{{ 'risk' if l.risk_level == 'high' else ('waiting' if l.risk_level == 'medium' else 'active') }}"></span>
+            <div class="avatar">{{ l.full_name[:2] }}</div>
+            <span class="fw-500">{{ l.full_name }}</span>
+          </div>
+        </td>
+        <td>
+          {% if l.score %}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="progress-wrap" style="width:70px;">
+              <div class="progress-bar" style="width:{{ l.score }}%;
+                background:{% if l.score >= 70 %}#639922{% elif l.score >= 45 %}#EF9F27{% else %}#E24B4A{% endif %}"></div>
+            </div>
+            <span class="text-sm">{{ l.score }}</span>
+          </div>
+          {% else %}<span class="text-muted">לא מולא</span>{% endif %}
+        </td>
+        <td><span class="badge badge-olive">{{ l.mashlul or '—' }}</span></td>
+        <td>
+          {% if l.risk_level == 'high' %}<span class="badge badge-risk">סיכון גבוה</span>
+          {% elif l.risk_level == 'medium' %}<span class="badge badge-warning">מעקב</span>
+          {% else %}<span class="badge badge-ok">תקין</span>{% endif %}
+        </td>
+        <td><span class="text-muted">{{ l.last_contact }}</span></td>
+        <td onclick="event.stopPropagation()">
+          <a href="/care-manager/{{ l.id }}" class="btn btn-secondary btn-sm">פרופיל</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;padding:2rem;color:#b89a83;">עוד אין לקוחות רשומות</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-3">
+
+  <div class="card">
+    <h4 class="section-title">⚠️ התראות סיכון</h4>
+    {% for alert in risk_alerts %}
+    <div style="padding:10px 0;border-bottom:1px solid rgba(99,71,52,.08);">
+      <a href="/care-manager/{{ alert.lakoach_id }}" style="color:var(--brown);text-decoration:none;">
+        <div class="fw-500 text-sm">{{ alert.lakoach_name }}</div>
+        <div class="text-muted" style="font-size:12px;">{{ alert.text }}</div>
+      </a>
+    </div>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין התראות פתוחות 🌿</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h4 class="section-title">📅 פגישות קרובות</h4>
+    {% for s in upcoming_sessions %}
+    <div style="padding:10px 0;border-bottom:1px solid rgba(99,71,52,.08);">
+      <div class="fw-500 text-sm">{{ s.scheduled_at[:16].replace('T', ' ') if s.scheduled_at else '' }}</div>
+      <div class="text-muted" style="font-size:12px;">{{ s.lakoach_name|default('') }}</div>
+    </div>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין פגישות קרובות</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h4 class="section-title">💬 WhatsApp — היום</h4>
+    {% for msg in wa_today %}
+    <div style="padding:8px 0;border-bottom:1px solid rgba(99,71,52,.08);">
+      <div class="flex-between">
+        <span class="fw-500 text-sm">{{ msg.user_id[:8] if msg.user_id else '' }}...</span>
+        <span class="text-muted" style="font-size:11px;">{{ msg.sent_at[11:16] if msg.sent_at else '' }}</span>
+      </div>
+      <div class="text-muted" style="font-size:12px;">{{ msg.body[:40] if msg.body else '' }}</div>
+    </div>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין הודעות היום</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

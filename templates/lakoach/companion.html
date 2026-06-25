@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Companion · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--terracotta:#a3502e;--terracotta-hover:#823d22;
+--clay-100:#e8c9b3;--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;--font-body:"Assistant","Heebo",sans-serif;
+}
+html,body{background:var(--cream);height:100%}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased;margin:0}
+.bubble{max-width:75%;padding:12px 18px;border-radius:20px;font-size:15px;line-height:1.6}
+.bubble-user{background:var(--clay-100);color:var(--brown);border-bottom-left-radius:6px}
+.bubble-ai{background:rgba(163,168,119,.2);color:var(--brown);border-bottom-right-radius:6px}
+.chat-wrap{display:flex;flex-direction:column;gap:14px}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+textarea{font-family:var(--font-body)}
+</style>
+</head>
+<body>
+
+<div style="background:rgba(255,240,219,.9); border-bottom:1px solid rgba(99,71,52,.1); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0;">
+  <a href="/lakoach" style="color:#8c6b54; font-size:14px; text-decoration:none;">← חזרה לדשבורד</a>
+  <div style="text-align:center;">
+    <div style="font-family:'Frank Ruhl Libre',Georgia,serif; font-size:1.1rem; color:#634734;">AI Companion בריאה</div>
+    <div style="font-size:11px; color:#b89a83;">כאן לתמוך ולהחזיק אותך בין המפגשים</div>
+  </div>
+  <div style="width:80px;"></div>
+</div>
+
+<div id="chat-area" style="padding:24px; max-width:680px; margin:0 auto; min-height:calc(100vh - 200px);">
+  <div class="chat-wrap" id="messages">
+    <div>
+      <div class="bubble bubble-ai">שלום {{ lakoach.full_name }} 🤍 איך את מרגישה היום?</div>
+      <div style="font-size:11px;color:#b89a83;margin-top:4px;margin-right:8px;">AI Companion · עכשיו</div>
+    </div>
+
+    {% for msg in history %}
+    <div style="display:flex; flex-direction:column; align-items:{% if msg.role == 'user' %}flex-end{% else %}flex-start{% endif %};">
+      <div class="bubble bubble-{{ msg.role }}">{{ msg.content }}</div>
+      <div style="font-size:11px;color:#b89a83;margin-top:4px;{% if msg.role == 'user' %}margin-left:8px; text-align:left;{% else %}margin-right:8px;{% endif %}">
+        {% if msg.role == 'user' %}את{% else %}AI Companion{% endif %} · {{ msg.created_at[:16] if msg.created_at else '' }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div style="position:sticky; bottom:0; background:rgba(255,240,219,.95); backdrop-filter:blur(8px); border-top:1px solid rgba(99,71,52,.1); padding:16px 24px;">
+  <div style="max-width:680px; margin:0 auto; display:flex; gap:12px; align-items:flex-end;">
+    <textarea id="msg-input"
+              placeholder="כתבי מה על הלב..."
+              rows="2"
+              style="flex:1; resize:none; border-radius:18px; padding:12px 16px; border:1px solid rgba(99,71,52,.2); background:#fffaf0; font-size:15px; color:#634734; outline:none;"
+              onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+    <button onclick="sendMessage()" class="btn btn-primary" style="flex-shrink:0; padding:12px 20px;">שלחי</button>
+  </div>
+  <div style="text-align:center; margin-top:8px; font-size:11px; color:#b89a83;">
+    זהו כלי תמיכה — לא תחליף לטיפול אנושי
+  </div>
+</div>
+
+<script>
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const messagesDiv = document.getElementById('messages');
+  const userBubble = `
+    <div style="display:flex;flex-direction:column;align-items:flex-end;">
+      <div class="bubble bubble-user">${text}</div>
+      <div style="font-size:11px;color:#b89a83;margin-top:4px;margin-left:8px;text-align:left;">את · עכשיו</div>
+    </div>`;
+  messagesDiv.insertAdjacentHTML('beforeend', userBubble);
+  input.value = '';
+
+  const typingId = 'typing-' + Date.now();
+  messagesDiv.insertAdjacentHTML('beforeend',
+    `<div id="${typingId}" class="bubble bubble-ai" style="color:#b89a83;font-style:italic;">מקלידה...</div>`);
+
+  document.getElementById('chat-area').scrollTop = 99999;
+
+  try {
+    const res = await fetch('/lakoach/companion', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text})
+    });
+    const data = await res.json();
+
+    document.getElementById(typingId).remove();
+    messagesDiv.insertAdjacentHTML('beforeend', `
+      <div style="display:flex;flex-direction:column;align-items:flex-start;">
+        <div class="bubble bubble-ai">${data.response || data.error || ''}</div>
+        <div style="font-size:11px;color:#b89a83;margin-top:4px;margin-right:8px;">AI Companion · עכשיו</div>
+      </div>`);
+  } catch(e) {
+    document.getElementById(typingId).remove();
+    messagesDiv.insertAdjacentHTML('beforeend',
+      `<div class="bubble bubble-ai">מצטערת, הייתה בעיה. נסי שוב.</div>`);
+  }
+  document.getElementById('chat-area').scrollTop = 99999;
+}
+</script>
+</body>
+</html>

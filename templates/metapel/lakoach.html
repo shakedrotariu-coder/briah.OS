@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ lakoach.full_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">{{ lakoach.full_name }}</h2>
+
+<div class="card-olive mb-3">
+  <div class="section-title">דגשים חשובים</div>
+  {% if degashim %}
+  <ul style="padding-right: 1.2rem;">
+    {% for d in degashim %}
+    <li>{{ d }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>לא הוזנו דגשים עדיין</p>
+  {% endif %}
+</div>
+
+<div class="card mb-3">
+  <div class="section-title">התוכנית האישית</div>
+  {% if tochnit %}
+  <div class="grid-3 mb-2">
+    <div><strong>{{ tochnit.tzir_1 }}</strong></div>
+    <div><strong>{{ tochnit.tzir_2 }}</strong></div>
+    <div><strong>{{ tochnit.tzir_3 }}</strong></div>
+  </div>
+  {% else %}
+  <p class="text-muted">תוכנית אישית עדיין לא נבנתה</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="flex-between mb-2">
+    <div class="section-title" style="border-bottom: none; margin-bottom: 0;">היסטוריית טיפולים</div>
+    <a href="/metapel/sikum/{{ lakoach.id }}" class="btn btn-primary btn-sm">+ העלה סיכום</a>
+  </div>
+
+  {% if sessions %}
+  <table class="data-table">
+    <thead>
+      <tr><th>תאריך</th><th>פגישה מספר</th><th>סיכום קצר</th><th>דגשים</th></tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+      <tr>
+        <td>{{ s.scheduled_at }}</td>
+        <td>{{ s.session_number }}</td>
+        <td>{{ s.sikum|default('—') }}</td>
+        <td>{{ s.degashim|default('—') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted">עדיין אין פגישות מתועדות</p>
+  {% endif %}
+</div>
+{% endblock %}

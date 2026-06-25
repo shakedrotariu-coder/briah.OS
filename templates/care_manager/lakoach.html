@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ lakoach.full_name }} · CRM{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">{{ lakoach.full_name }}</h2>
+
+{% if risk_flags %}
+<div class="card mb-3" style="border-color:#F7C1C1;">
+  <div class="section-title">⚠️ דגלי סיכון פתוחים</div>
+  {% for f in risk_flags %}
+  <div class="flex-center gap-1 mb-1">
+    <span class="badge badge-{{ 'risk' if f.severity == 'high' else 'warning' }}">{{ 'גבוה' if f.severity == 'high' else 'מעקב' }}</span>
+    <span>{{ f.text }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card mb-3" style="text-align:center;">
+  <div class="eyebrow">Resilience Score</div>
+  <div class="score-circle" style="--pct: {{ score }}; margin: 1rem auto;">
+    <div class="score-inner">{{ score }}</div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="section-title">התוכנית האישית</div>
+  {% if tochnit %}
+  <div class="grid-3">
+    <div><strong>{{ tochnit.tzir_1 }}</strong></div>
+    <div><strong>{{ tochnit.tzir_2 }}</strong></div>
+    <div><strong>{{ tochnit.tzir_3 }}</strong></div>
+  </div>
+  {% else %}
+  <p class="text-muted">תוכנית אישית עדיין לא נבנתה</p>
+  {% endif %}
+</div>
+
+{% if strengths %}
+<div class="card-olive mb-3">
+  <div class="eyebrow mb-2">החוזקות שלה</div>
+  {% for s in strengths %}
+  <div class="flex-center gap-1 mb-1"><span style="color:#639922">✓</span><span>{{ s }}</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if personal_letter %}
+<div class="card-brown mb-3">
+  <div class="eyebrow" style="color:rgba(255,240,219,.6); margin-bottom:12px;">מכתב אישי</div>
+  <p style="line-height:2; color:#fff0db; white-space:pre-line;">{{ personal_letter }}</p>
+</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="section-title">היסטוריית פגישות</div>
+  {% if sessions %}
+  <table class="data-table">
+    <thead><tr><th>תאריך</th><th>סיכום קצר</th><th>דגשים</th></tr></thead>
+    <tbody>
+      {% for s in sessions %}
+      <tr>
+        <td>{{ s.scheduled_at }}</td>
+        <td>{{ s.sikum|default('—') }}</td>
+        <td>{{ s.degashim|default('—') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted">עדיין אין פגישות מתועדות</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="section-title">היסטוריית WhatsApp</div>
+  {% if wa_history %}
+  {% for msg in wa_history %}
+  <div class="flex-between mb-1" style="border-bottom:1px solid rgba(99,71,52,.06); padding-bottom:6px;">
+    <span class="text-sm">{{ 'נכנס' if msg.direction == 'inbound' else 'יוצא' }}: {{ msg.body }}</span>
+    <span class="text-muted" style="font-size:11px;">{{ msg.sent_at[:16] if msg.sent_at else '' }}</span>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="text-muted">אין הודעות WhatsApp</p>
+  {% endif %}
+</div>
+{% endblock %}

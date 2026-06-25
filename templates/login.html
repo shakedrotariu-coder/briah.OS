@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set hide_sidebar = true %}
+{% set hide_nav = true %}
+
+{% block title %}כניסה · בריאה{% endblock %}
+
+{% block content %}
+<div class="full-page">
+  <div class="card" style="width: 420px; text-align: center;">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.4rem; margin-bottom: 4px;">בריא.ה</h1>
+      <p class="text-muted">מעטפת לחיים עצמם</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" style="text-align: right;">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+      <div class="field-group" style="text-align: right;">
+        <label class="field-label">כתובת מייל</label>
+        <input type="email" name="email" required placeholder="your@email.com" dir="ltr">
+      </div>
+      <div class="field-group" style="text-align: right;">
+        <label class="field-label">סיסמה</label>
+        <input type="password" name="password" required placeholder="••••••••" dir="ltr">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top: 0.5rem;">
+        כניסה
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}שיבוץ מטפל ללקוח{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">שיבוץ מטפל ללקוח</h2>
+
+<div class="card" style="max-width: 560px;">
+  <div class="mb-3">
+    <div class="eyebrow">לקוח</div>
+    <h3>{{ lakoach.full_name }}</h3>
+    <span class="badge badge-cream">{{ lakoach.mashlul }}</span>
+  </div>
+
+  <form method="POST" action="/admin/shibutz/{{ lakoach.id }}">
+    <div class="field-group">
+      <label class="field-label">בחר מטפל 1:1</label>
+      <select name="metapel_id" required>
+        {% for m in metaplim %}
+        <option value="{{ m.id }}">{{ m.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">אשר שיבוץ</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}אינטייק — {{ lakoach.full_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">אינטייק — {{ lakoach.full_name }}</h2>
+
+<form id="intake-save-form" method="POST" action="/melave/intake/{{ lakoach.id }}/save">
+<div class="intake-grid">
+  <div class="card">
+    <div class="section-title">העלאת הקלטת השיחה</div>
+
+    <div class="upload-zone mb-3" id="upload-zone">
+      <div class="upload-icon">🎙️</div>
+      <div>גררו לכאן קובץ הקלטה (MP3 / M4A / WAV)</div>
+      <input type="file" id="audio-file" accept="audio/*" style="display:none;">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">או הדבק תמלול ידני</label>
+      <textarea id="manual-transcript" placeholder="הדבקו כאן את התמלול..."></textarea>
+    </div>
+
+    <div id="process-status" class="flash flash-info" style="display:none;"></div>
+
+    <button type="button" id="process-btn" class="btn btn-primary btn-full">עבד עם AI →</button>
+  </div>
+
+  <div class="card" id="results-section" style="display:none;">
+    <div class="section-title">תוצאות האינטייק</div>
+
+    <div class="field-group">
+      <label class="field-label">מה עלה בשיחה</label>
+      <textarea id="result-summary" name="ma_ala_bashicha"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">רצון עמוק שעלה</label>
+      <textarea id="result-desire" name="ratzon_amok"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">נושאים מרכזיים</label>
+      <textarea id="result-themes" name="nosim"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="field-group">
+    <label class="field-label">הערות ודגשים של המלווה</label>
+    <textarea name="melave_notes" placeholder="הערות חופשיות..."></textarea>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">דגשים להעברה לצוות</label>
+    <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="needs_grounding"> זקוקה לקרקוע</label>
+    <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="touch_sensitivity"> רגישות גבוהה למגע</label>
+    <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="large_spaces"> קושי במרחבים גדולים</label>
+    <label class="flex-center gap-1 mb-1"><input type="checkbox" style="width:auto;" name="degashim" value="social_situations"> יש לשים לב במצבים חברתיים</label>
+    <input type="text" name="degash_extra" placeholder="דגש נוסף..." class="mt-2">
+  </div>
+
+  <div class="flex gap-1 mt-3">
+    <button type="submit" class="btn btn-secondary">שמור אינטייק</button>
+    <a href="/melave/tochnit/{{ lakoach.id }}" class="btn btn-primary">המשך לבניית תוכנית אישית ←</a>
+  </div>
+</div>
+</form>
+
+<script>
+  document.getElementById('upload-zone').addEventListener('click', function () {
+    document.getElementById('audio-file').click();
+  });
+
+  document.getElementById('process-btn').addEventListener('click', function () {
+    const status = document.getElementById('process-status');
+    const results = document.getElementById('results-section');
+    status.style.display = 'block';
+    status.textContent = 'מעבד...';
+
+    const formData = new FormData();
+    formData.append('transcript', document.getElementById('manual-transcript').value);
+    formData.append('melave_notes', document.querySelector('[name=melave_notes]').value);
+    const audioFile = document.getElementById('audio-file').files[0];
+    if (audioFile) formData.append('audio_file', audioFile);
+
+    fetch('/melave/intake/{{ lakoach.id }}/process', { method: 'POST', body: formData })
+      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        const data = res.data || {};
+        status.textContent = 'הושלם';
+        document.getElementById('result-summary').value = data.ma_ala_bashicha || '';
+        document.getElementById('result-desire').value = data.ratzon_amok || '';
+        document.getElementById('result-themes').value = (data.nosim_merkaziyim || []).join(', ');
+        results.style.display = 'block';
+      })
+      .catch(function () {
+        status.textContent = 'שגיאה בעיבוד — נסו שוב';
+      });
+  });
+</script>
+{% endblock %}
