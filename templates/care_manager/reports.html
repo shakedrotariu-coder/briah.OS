@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}דוחות · CRM{% endblock %}
+
+{% block content %}
+<div class="flex-between mb-3">
+  <h2>דוחות</h2>
+  <a href="/care-manager" class="btn btn-secondary btn-sm">← חזרה ל-CRM</a>
+</div>
+
+<div class="grid-4 mb-4">
+  <div class="metric-card">
+    <div class="metric-label">לקוחות פעילים</div>
+    <div class="metric-value">{{ active_members|length }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">בהקפאה</div>
+    <div class="metric-value">{{ on_hold_members|length }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">לא פעילים</div>
+    <div class="metric-value">{{ inactive_members|length }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">ללא מטפל 1:1</div>
+    <div class="metric-value" style="color:#EF9F27;">{{ no_metapel|length }}</div>
+  </div>
+</div>
+
+<div class="grid-2 mb-4">
+
+  <div class="card">
+    <div class="section-title">לקוחות פעילים</div>
+    {% if active_members %}
+    <table class="data-table">
+      <thead><tr><th>שם</th><th>מסלול</th><th>תאריך התחלה</th></tr></thead>
+      <tbody>
+        {% for m in active_members %}
+        <tr onclick="location.href='/care-manager/{{ m.id }}'">
+          <td>{{ m.full_name }}</td>
+          <td><span class="badge badge-cream">{{ m.mashlul or '—' }}</span></td>
+          <td class="text-muted">{{ m.start_date or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין לקוחות פעילים</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title">ללא תוכנית אישית שנשלחה</div>
+    {% if no_plan_sent %}
+    <table class="data-table">
+      <thead><tr><th>שם</th><th>מסלול</th></tr></thead>
+      <tbody>
+        {% for m in no_plan_sent %}
+        <tr onclick="location.href='/care-manager/{{ m.id }}'">
+          <td>{{ m.full_name }}</td>
+          <td><span class="badge badge-warning">{{ m.mashlul or '—' }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">לכולם נשלחה תוכנית 🌿</p>
+    {% endif %}
+  </div>
+
+</div>
+
+<div class="grid-2 mb-4">
+
+  <div class="card">
+    <div class="section-title">בהקפאה</div>
+    {% if on_hold_members %}
+    {% for m in on_hold_members %}
+    <div class="flex-between mb-1" style="padding-bottom:6px;border-bottom:1px solid rgba(99,71,52,.06);">
+      <span>{{ m.full_name }}</span>
+      <span class="badge badge-warning">בהקפאה</span>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין לקוחות בהקפאה</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title">לא פעילים</div>
+    {% if inactive_members %}
+    {% for m in inactive_members %}
+    <div class="flex-between mb-1" style="padding-bottom:6px;border-bottom:1px solid rgba(99,71,52,.06);">
+      <span>{{ m.full_name }}</span>
+      <span class="badge badge-cream">{{ m.mashlul or '—' }}</span>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:1rem;">אין לקוחות לא-פעילים</p>
+    {% endif %}
+  </div>
+
+</div>
+
+<div class="card mb-4">
+  <div class="section-title">ללא מטפל 1:1 משובץ</div>
+  {% if no_metapel %}
+  <table class="data-table">
+    <thead><tr><th>שם</th><th>מסלול</th><th>פעולה</th></tr></thead>
+    <tbody>
+      {% for m in no_metapel %}
+      <tr>
+        <td>{{ m.full_name }}</td>
+        <td><span class="badge badge-cream">{{ m.mashlul or '—' }}</span></td>
+        <td><a href="/admin/shibutz/{{ m.id }}" class="btn btn-secondary btn-sm">שבץ מטפל</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted" style="text-align:center;padding:1rem;">לכולם משובץ מטפל 🌿</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="section-title">פגישות מתוכננות</div>
+  {% if upcoming_sessions %}
+  <table class="data-table">
+    <thead><tr><th>תאריך</th><th>סטטוס</th></tr></thead>
+    <tbody>
+      {% for s in upcoming_sessions %}
+      <tr>
+        <td>{{ s.scheduled_at }}</td>
+        <td><span class="badge badge-ok">{{ s.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted" style="text-align:center;padding:1rem;">אין פגישות מתוכננות</p>
+  {% endif %}
+</div>
+{% endblock %}

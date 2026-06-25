@@ -198,6 +198,66 @@ def dashboard():
     )
 
 
+@cm_bp.route("/reports")
+@login_required
+@_care_manager_only
+def reports():
+    """Reports built only from data we actually store — no payments/leads tables exist."""
+    active_members = []
+    on_hold_members = []
+    inactive_members = []
+    no_metapel = []
+    no_plan_sent = []
+    upcoming_sessions = []
+
+    if supabase is not None:
+        try:
+            profiles = supabase.table("lakoach_profiles").select("*, users(*)").execute().data or []
+
+            for p in profiles:
+                u = p.get("users") or {}
+                row = {**u, "mashlul": p.get("mashlul", ""), "start_date": p.get("start_date", "")}
+                status = p.get("status", "active")
+
+                if status == "active":
+                    active_members.append(row)
+                elif status == "paused":
+                    on_hold_members.append(row)
+                else:
+                    inactive_members.append(row)
+
+                if not p.get("metapel_id"):
+                    no_metapel.append(row)
+
+            tochniyot = supabase.table("tochniyot_ishiyot").select("lakoach_id, sent_at").execute().data or []
+            sent_lakoach_ids = {t["lakoach_id"] for t in tochniyot if t.get("sent_at")}
+            no_plan_sent = [row for row in active_members if row.get("id") not in sent_lakoach_ids]
+
+            upcoming_sessions = (
+                supabase.table("sessions")
+                .select("*")
+                .eq("status", "scheduled")
+                .gte("scheduled_at", datetime.now(timezone.utc).isoformat())
+                .order("scheduled_at")
+                .limit(20)
+                .execute()
+                .data
+                or []
+            )
+        except Exception:
+            logger.exception("Failed to load reports, using empty data")
+
+    return render_template(
+        "care_manager/reports.html",
+        active_members=active_members,
+        on_hold_members=on_hold_members,
+        inactive_members=inactive_members,
+        no_metapel=no_metapel,
+        no_plan_sent=no_plan_sent,
+        upcoming_sessions=upcoming_sessions,
+    )
+
+
 @cm_bp.route("/<lakoach_id>")
 @login_required
 @_care_manager_only
