@@ -33,7 +33,7 @@ def _send(msg: MIMEMultipart) -> bool:
 
 def send_intake_invite(to_email: str, full_name: str, intake_token: str) -> bool:
     """Send intake invitation email with unique link"""
-    intake_url = f"{os.getenv('BASE_URL', 'http://localhost:5000')}/intake/{intake_token}"
+    intake_url = f"{os.getenv('BASE_URL', 'http://localhost:5000')}/onboarding/{intake_token}"
 
     html_body = f"""
     <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px;

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}רפלקציה חודשית · CRM{% endblock %}
+
+{% block content %}
+{% set status_map = {
+  'flourishing': ('פורחת', 'badge-ok'),
+  'progressing': ('בהתקדמות', 'badge-olive'),
+  'plateau': ('מישור', 'badge-warning'),
+  'at_risk': ('דורשת תשומת לב', 'badge-risk'),
+  'needs_attention': ('⚠️ נדרשת פנייה', 'badge-risk'),
+} %}
+
+<div class="flex-between mb-3">
+  <h2>רפלקציה — חודש {{ month_num }}</h2>
+  <a href="/care-manager/{{ lakoach_id }}" class="btn btn-secondary btn-sm">← חזרה לפרופיל</a>
+</div>
+
+<span class="badge {{ status_map.get(analysis.overall_status, ('', 'badge-olive'))[1] }} mb-3" style="font-size:14px; padding:8px 16px;">
+  {{ status_map.get(analysis.overall_status, (analysis.overall_status, ''))[0] }}
+</span>
+
+<div class="card-olive mb-3">
+  <div class="eyebrow mb-2">סיכום AI</div>
+  <p style="font-size:15px; line-height:1.8; color:#634734;">{{ analysis.summary }}</p>
+</div>
+
+{% if analysis.risk_flags %}
+<div class="card mb-3" style="border:1.5px solid {% if analysis.risk_flags[0].severity == 'high' %}#E24B4A{% else %}#EF9F27{% endif %};">
+  <h4 class="section-title">⚠️ דגלי סיכון</h4>
+  {% for flag in analysis.risk_flags %}
+  <div style="padding:12px 0; border-bottom:1px solid rgba(99,71,52,.08);">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+      <span class="badge {{ 'badge-risk' if flag.severity == 'high' else 'badge-warning' }}">
+        {{ '🔴' if flag.severity == 'high' else '🟡' }} {{ flag.area }}
+      </span>
+    </div>
+    <p style="font-size:14px; color:#634734; margin-bottom:4px;">{{ flag.description }}</p>
+    <p style="font-size:13px; color:#a3502e; font-weight:500;">המלצה: {{ flag.recommended_action }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid-2 mb-3">
+
+  <div class="card">
+    <h4 class="section-title">שייכות ומוחזקות</h4>
+    <div style="font-size:2rem; text-align:center; color:{{ '#639922' if analysis.avg_belonging >= 3.5 else '#EF9F27' if analysis.avg_belonging >= 2.5 else '#E24B4A' }}; font-family:'Frank Ruhl Libre',Georgia,serif; margin-bottom:8px;">
+      {{ "%.1f"|format(analysis.avg_belonging) }}/5
+    </div>
+    {% for key, label in [
+      ('feeling_seen','רואים אותה'),('feeling_belong','שייכות'),
+      ('feeling_safe','בנוח להיות עצמה'),('feeling_supported','יש למי לפנות'),
+      ('liuvy_meaningful','ליווי משמעותי'),('feeling_held','מוחזקת')
+    ] %}
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(99,71,52,.06);">
+      <span style="font-size:12px; color:#8c6b54;">{{ label }}</span>
+      <div style="display:flex; gap:3px;">
+        {% for n in range(1,6) %}
+        <div style="width:10px; height:10px; border-radius:50%; background:{{ '#a3502e' if n <= analysis.belonging_scores.get(key,0) else 'rgba(99,71,52,.15)' }};"></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h4 class="section-title">רווחה אישית</h4>
+    <div style="font-size:2rem; text-align:center; color:{{ '#639922' if analysis.avg_wellbeing >= 3.5 else '#EF9F27' if analysis.avg_wellbeing >= 2.5 else '#E24B4A' }}; font-family:'Frank Ruhl Libre',Georgia,serif; margin-bottom:8px;">
+      {{ "%.1f"|format(analysis.avg_wellbeing) }}/5
+    </div>
+    {% for key, label in [
+      ('resilience','יכולת ויסות'),('tools','כלים בשגרה'),
+      ('body_connect','חיבור לגוף'),('daily_use','יישום בחיים'),
+      ('direction','כיוון ומשמעות'),('general','תחושה כללית')
+    ] %}
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(99,71,52,.06);">
+      <span style="font-size:12px; color:#8c6b54;">{{ label }}</span>
+      <div style="display:flex; gap:3px;">
+        {% for n in range(1,6) %}
+        <div style="width:10px; height:10px; border-radius:50%; background:{{ '#639922' if n <= analysis.wellbeing_scores.get(key,0) else 'rgba(99,71,52,.15)' }};"></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card mb-3" style="border-right:4px solid #a3502e;">
+  <div class="eyebrow mb-2">📝 הערה למלווה</div>
+  <p style="font-size:15px; color:#634734; line-height:1.8;">{{ analysis.melave_note }}</p>
+</div>
+
+<div class="card mb-3">
+  <h4 class="section-title">המלצות לתוכנית</h4>
+  {% for rec in analysis.recommended_adjustments %}
+  <div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(99,71,52,.07);">
+    <span style="color:#a3502e; flex-shrink:0;">→</span>
+    <span style="font-size:14px;">{{ rec }}</span>
+  </div>
+  {% endfor %}
+</div>
+
+{% if analysis.content_feedback %}
+<div class="card" style="background:rgba(203,198,169,.1);">
+  <div class="eyebrow mb-2">💬 פידבק על תוכן (לצוות)</div>
+  <p style="font-size:13px; color:#634734;">{{ analysis.content_feedback }}</p>
+</div>
+{% endif %}
+
+{% if month_history|length > 1 %}
+<div class="card mt-3">
+  <h4 class="section-title">מגמת התקדמות</h4>
+  <canvas id="progress-chart" height="120"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+new Chart(document.getElementById('progress-chart'), {
+  type: 'line',
+  data: {
+    labels: {{ month_labels | tojson }},
+    datasets: [
+      {
+        label: 'שייכות', data: {{ belonging_history | tojson }},
+        borderColor: '#a3502e', backgroundColor: 'rgba(163,80,46,.08)',
+        tension: 0.4, fill: false
+      },
+      {
+        label: 'רווחה', data: {{ wellbeing_history | tojson }},
+        borderColor: '#a3a877', backgroundColor: 'rgba(163,168,119,.08)',
+        tension: 0.4, fill: false
+      }
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    scales: { y: { min: 1, max: 5 } }
+  }
+});
+</script>
+{% endif %}
+{% endblock %}

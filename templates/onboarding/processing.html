@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בונה את המסע שלך · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#fff0db;--brown:#634734;--terracotta:#a3502e;--brown-200:#8c6b54;--brown-100:#b89a83;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;--font-body:"Assistant","Heebo",sans-serif;}
+html{background:var(--cream)}
+body{font-family:var(--font-body);color:var(--brown);-webkit-font-smoothing:antialiased;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+.onboarding-card{max-width:480px;width:100%;background:#fffaf0;border-radius:28px;padding:3rem 2rem;box-shadow:0 6px 18px -8px rgba(99,71,52,.18);text-align:center}
+h3{font-family:var(--font-display);font-weight:400;color:#634734}
+.spinner{width:56px;height:56px;border:4px solid rgba(163,80,46,.2);border-top-color:#a3502e;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="onboarding-card">
+  <div class="spinner"></div>
+  <h3>בונה את המסע שלך...</h3>
+  <p style="color:#8c6b54; margin-top:8px;">ה-AI של בריאה עובד על הפרופיל שלך</p>
+  <p style="color:#b89a83; font-size:13px; margin-top:4px;">זה לוקח כ-15 שניות</p>
+</div>
+
+<script>
+fetch('/onboarding/process/{{ token }}/run', { method: 'POST' })
+  .then(function () { window.location.href = '/onboarding/{{ token }}/result'; })
+  .catch(function () { window.location.href = '/onboarding/{{ token }}/result'; });
+</script>
+</body>
+</html>

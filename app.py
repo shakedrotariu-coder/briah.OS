@@ -16,6 +16,8 @@ from routes.lakoach import lakoach_bp
 from routes.intake import intake_bp
 from routes.whatsapp import wa_bp
 from routes.care_manager import cm_bp
+from routes.onboarding import ob_bp
+from routes.reflection import reflection_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
@@ -25,6 +27,8 @@ app.register_blueprint(lakoach_bp)
 app.register_blueprint(intake_bp)
 app.register_blueprint(wa_bp)
 app.register_blueprint(cm_bp)
+app.register_blueprint(ob_bp)
+app.register_blueprint(reflection_bp)
 
 _ROLE_HOME = {
     "admin": "/admin",

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>המסע שלך מוכן · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--shadow-md:0 6px 18px -8px rgba(99,71,52,.18);
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);min-height:100vh;padding:2rem 1rem;}
+h2,h4{font-family:var(--font-display);font-weight:400;color:var(--brown)}
+p{line-height:1.75}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+.card{background:var(--cream-50);border:1px solid rgba(99,71,52,.12);border-radius:24px;padding:1.5rem;box-shadow:var(--shadow-md)}
+.card-brown{background:var(--brown);border-radius:24px;padding:2rem;color:var(--cream)}
+.card-olive{background:rgba(163,168,119,.18);border:1px solid rgba(163,168,119,.35);border-radius:18px;padding:1.5rem}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brown-100)}
+.section-title{font-family:var(--font-display);font-size:1.1rem;font-weight:500;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(99,71,52,.1)}
+.text-muted{color:var(--brown-100);font-size:13px}
+.mb-2{margin-bottom:1rem}.mb-3{margin-bottom:1.5rem}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.progress-wrap{background:rgba(99,71,52,.1);border-radius:999px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:999px;transition:width .5s}
+.score-circle{width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--terracotta) calc(var(--pct,0)*1%),rgba(99,71,52,.1) 0);display:flex;align-items:center;justify-content:center}
+.score-inner{width:86px;height:86px;border-radius:50%;background:var(--cream-50);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.8rem;color:var(--brown)}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div style="max-width:640px; width:100%; margin:0 auto;">
+
+  <div class="card-brown mb-3" style="text-align:center; padding:2.5rem 2rem;">
+    <div style="font-size:2rem; margin-bottom:12px;">🌿</div>
+    <h2 style="color:#fff0db; font-size:1.8rem;">
+      {{ lakoach.full_name }}, המסע שלך בבריאה מוכן
+    </h2>
+    <p style="color:rgba(255,240,219,.8); margin-top:8px;">
+      {{ ai_result.summary_he }}
+    </p>
+  </div>
+
+  <div class="card mb-3" style="text-align:center;">
+    <div class="eyebrow mb-2">Resilience Score שלך</div>
+    <div class="score-circle" style="--pct:{{ ai_result.resilience_score }}; margin:0 auto 12px;">
+      <div class="score-inner">{{ ai_result.resilience_score }}</div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <h4 class="section-title">חמשת המישורים שלך</h4>
+    {% for key, name in [('karakoa','קרקוע 🌱'),('preka','פריקה 🌊'),
+                          ('integrazia','אינטגרציה 🧩'),('kehila','קהילה 🤍'),('mashmaut','משמעות ✨')] %}
+    <div style="margin-bottom:14px;">
+      <div class="flex-between" style="margin-bottom:4px;">
+        <span style="font-size:14px; font-weight:500;">{{ name }}</span>
+        <span class="text-muted">{{ ai_result.breakdown[key] }}%</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" style="width:{{ ai_result.breakdown[key] }}%;
+          background:{% if ai_result.breakdown[key] >= 70 %}#639922
+                     {% elif ai_result.breakdown[key] >= 45 %}#EF9F27
+                     {% else %}#a3502e{% endif %}"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid-2 mb-3">
+    <div class="card-olive">
+      <div class="eyebrow mb-2">החוזקות שלך</div>
+      {% for s in ai_result.strengths %}
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="color:#639922; font-size:16px;">✓</span>
+        <span style="font-size:14px;">{{ s }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <div class="eyebrow mb-2">הזמנה לצמיחה</div>
+      {% for g in ai_result.growth_areas %}
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="font-size:16px;">🌱</span>
+        <span style="font-size:14px;">{{ g }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <h4 class="section-title">הפעילויות המומלצות עבורך</h4>
+    <div class="grid-3">
+      {% for act in ai_result.recommended_activities %}
+      <div style="background:rgba(163,168,119,.1); border-radius:14px; padding:14px; text-align:center;">
+        <div style="font-size:1.4rem; margin-bottom:6px;">🌿</div>
+        <div style="font-size:13px; font-weight:500; color:#634734;">{{ act }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card-brown mb-3" style="border-radius:24px; padding:2rem;">
+    <div class="eyebrow" style="color:rgba(255,240,219,.5); margin-bottom:12px;">מכתב אישי</div>
+    <p style="color:#fff0db; line-height:2; white-space:pre-line; font-size:15px;">
+      {{ ai_result.personal_letter }}
+    </p>
+  </div>
+
+  <div class="card" style="text-align:center; border-radius:24px; padding:2rem;">
+    <h4 style="margin-bottom:8px;">מה הלאה?</h4>
+    <p class="text-muted mb-3">
+      המלווה שלך קיבל את הפרופיל ויצור איתך קשר בקרוב.<br>
+      📧 שלחנו לך עותק ל-{{ lakoach.email }}
+    </p>
+    <a href="/lakoach" class="btn btn-primary">כניסה לדשבורד שלי →</a>
+  </div>
+
+</div>
+</body>
+</html>

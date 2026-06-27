@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רפלקציה חודשית · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--terracotta:#a3502e;--terracotta-hover:#823d22;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);min-height:100vh;padding:2rem 1rem;}
+h3,h4{font-family:var(--font-display);font-weight:400;color:var(--brown)}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+.btn-full{width:100%}
+.field-group{margin-bottom:1.25rem}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--brown-200);margin-bottom:6px}
+input[type=text],textarea,select{
+  width:100%;padding:12px 16px;border:1px solid rgba(99,71,52,.2);border-radius:18px;
+  background:var(--cream-50);color:var(--brown);font-family:var(--font-body);font-size:15px;outline:none;resize:vertical;
+}
+input:focus,textarea:focus,select:focus{border-color:rgba(163,80,46,.5);box-shadow:0 0 0 3px rgba(163,80,46,.08)}
+
+.onboarding-card{max-width:640px;margin:0 auto;background:#fffaf0;border-radius:28px;padding:2rem 2rem 2.5rem;box-shadow:0 6px 18px -8px rgba(99,71,52,.18)}
+.step-emoji{font-size:2rem;margin-bottom:12px;display:block}
+.step-title{font-family:"Frank Ruhl Libre",Georgia,serif;font-size:1.6rem;font-weight:400;color:#634734;margin-bottom:6px}
+.step-desc{font-size:14px;color:#8c6b54;margin-bottom:1.5rem}
+
+.chips-grid{display:flex;flex-wrap:wrap;gap:8px}
+.chip{cursor:pointer}
+.chip input{display:none}
+.chip span{display:inline-block;padding:7px 14px;border-radius:999px;border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;font-size:13px;color:#634734;transition:all .15s}
+.chip input:checked + span{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:500}
+
+.section-card{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(99,71,52,.1)}
+.section-num{font-size:11px;font-weight:600;letter-spacing:.15em;color:#b89a83;margin-bottom:4px}
+.scale-row{margin-bottom:16px}
+.scale-stmt{font-size:14px;color:#634734;margin-bottom:8px}
+.scale-5{display:flex;gap:8px}
+.scale-opt{cursor:pointer}
+.scale-opt input{display:none}
+.scale-opt span{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;font-size:13px;color:#634734;transition:all .15s}
+.scale-opt input:checked + span{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:600}
+.scale-5.horizontal{justify-content:space-between}
+.scale-opt-lg{cursor:pointer;flex:1}
+.scale-opt-lg input{display:none}
+.scale-opt-lg span.num{display:flex;align-items:center;justify-content:center;width:100%;height:44px;border-radius:14px;border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;font-size:15px;color:#634734;transition:all .15s}
+.scale-opt-lg input:checked + span.num{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:600}
+.scale-ends-row{display:flex;justify-content:space-between;font-size:11px;color:#b89a83;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="onboarding-card">
+  <div class="step-emoji">🌙</div>
+  <h3 class="step-title">רפלקציה חודשית</h3>
+  <p class="step-desc">חודש אחד בבריאה — נשמח לשמוע איך היה 🤍</p>
+
+  <form method="POST" action="/lakoach/reflection/{{ month }}">
+
+    <div class="section-card">
+      <div class="section-num">01</div>
+      <h4>הסדנאות</h4>
+
+      <div class="field-group">
+        <label class="field-label">איזו סדנה הכי נגעה בך החודש?</label>
+        <select name="best_workshop">
+          <option value="">בחרי...</option>
+          {% for w in workshops %}
+          <option>{{ w }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">באיזה דרך הסדנה הזו תמכה בך?</label>
+        <textarea name="best_workshop_why" rows="3" placeholder="מה קרה שם? מה שחררת? מה הרגשת?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">האם הייתה סדנה שפחות התחברת אליה?</label>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <label class="chip"><input type="radio" name="had_bad_workshop" value="yes" onchange="showBadWorkshop()"><span>כן</span></label>
+          <label class="chip"><input type="radio" name="had_bad_workshop" value="no" onchange="document.getElementById('bad-workshop').style.display='none'"><span>לא</span></label>
+        </div>
+        <div id="bad-workshop" style="display:none;">
+          <input type="text" name="bad_workshop" placeholder="שם הסדנה" style="margin-bottom:8px;">
+          <textarea name="bad_workshop_why" rows="2" placeholder="מה הרגשת שחסר?"></textarea>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">האם יש סדנה שהיית מוסיפה למערכת?</label>
+        <input type="text" name="suggest_workshop" placeholder="כל רעיון שעולה לך...">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">יש יום / שעה שהיית שמחה לראות שעדיין לא קיים?</label>
+        <input type="text" name="suggest_time" placeholder="לדוגמה: רביעי ערב, שני בוקר...">
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-num">02</div>
+      <h4>המנחים</h4>
+
+      <div class="field-group">
+        <label class="field-label">איזה מנחה נגע בך במיוחד? מדוע?</label>
+        <textarea name="best_facilitator" rows="2" placeholder="שם + מה הרגשת..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">האם יש מנחה שפחות התחברת אליו/ה? (לא חובה)</label>
+        <textarea name="bad_facilitator" rows="2" placeholder="מה חסר? מה לא התאים? הכל בסדר לשתף..."></textarea>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-num">03</div>
+      <h4>איך את מרגישה בבריאה?</h4>
+
+      {% for stmt in [
+        ('feeling_seen', 'אני מרגישה שרואים אותי בבריאה'),
+        ('feeling_belong', 'אני מרגישה שייכת למרחב'),
+        ('feeling_safe', 'אני מרגישה בנוח להיות מי שאני כאן'),
+        ('feeling_supported', 'יש לי למי לפנות בבריאה בעת הצורך'),
+        ('liuvy_meaningful', 'שיחות הליווי משמעותיות עבורי'),
+        ('feeling_held', 'אני מרגישה מוחזקת בתוך התהליך שלי'),
+      ] %}
+      <div class="scale-row">
+        <div class="scale-stmt">{{ stmt[1] }}</div>
+        <div class="scale-5">
+          {% for n in [1,2,3,4,5] %}
+          <label class="scale-opt">
+            <input type="radio" name="{{ stmt[0] }}" value="{{ n }}" required>
+            <span>{{ n }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="scale-ends-row">
+          <span>ממש לא</span>
+          <span>לגמרי</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-card">
+      <div class="section-num">04</div>
+      <h4>ההשפעה על החיים שלך</h4>
+
+      <div class="field-group">
+        <label class="field-label">עד כמה התהליך תורם לך כיום?</label>
+        <div class="scale-5 horizontal">
+          {% for n in [1,2,3,4,5] %}
+          <label class="scale-opt-lg">
+            <input type="radio" name="contribution" value="{{ n }}" required>
+            <span class="num">{{ n }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="scale-ends-row"><span>כלל לא</span><span>מאוד מאוד</span></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">באיזה אופן התהליך תורם לך כיום?</label>
+        <textarea name="how_contributing" rows="3" placeholder="כלים? שחרור? חיבור? תגלי..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="margin-bottom:16px;">
+          עד כמה את מסכימה עם המשפטים הבאים:<br>
+          <span style="font-size:12px; color:#b89a83;">השוואה לתחילת התהליך</span>
+        </label>
+
+        {% for stmt in [
+          ('resilience', 'אני מרגישה מסוגלת להירגע ולהתאזן גם ברגעים מאתגרים'),
+          ('tools', 'יש לי כלים שעוזרים לי להתמודד עם מתח ועומס'),
+          ('body_connect', 'אני מרגישה מחוברת לגוף שלי ולתחושות שלי'),
+          ('daily_use', 'אני מצליחה להשתמש בדברים שלמדתי בשגרה שלי'),
+          ('direction', 'יש לי תחושת כיוון ומשמעות בתקופה הזו'),
+          ('general', 'באופן כללי, אני מרגישה בנוח עם עצמי ועם החיים שלי'),
+        ] %}
+        <div class="scale-row">
+          <div class="scale-stmt">{{ stmt[1] }}</div>
+          <div class="scale-5">
+            {% for n in [1,2,3,4,5] %}
+            <label class="scale-opt">
+              <input type="radio" name="{{ stmt[0] }}" value="{{ n }}" required>
+              <span>{{ n }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-num">05</div>
+      <h4>עוד קצת</h4>
+
+      <div class="field-group">
+        <label class="field-label">האם התוכנית האישית מתאימה לצרכים שלך?</label>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          {% for opt in ['כן מאוד', 'בינוני', 'לא ממש'] %}
+          <label class="chip"><input type="radio" name="plan_fit" value="{{ opt }}"><span>{{ opt }}</span></label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">האם יש משהו שחסר לך בתהליך?</label>
+        <textarea name="whats_missing" rows="3"
+                  placeholder="קהילה? יותר מפגשים? סוג טיפול אחר? אנחנו כאן לשמוע..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">מה בריאה מסמלת עבורך כרגע בחייך?</label>
+        <textarea name="what_briah_means" rows="2"
+                  placeholder="מילה, משפט, תמונה..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">עד כמה היית ממליצה לאחרים להצטרף?</label>
+        <div class="scale-5 horizontal">
+          {% for n in [1,2,3,4,5] %}
+          <label class="scale-opt-lg">
+            <input type="radio" name="recommend" value="{{ n }}" required>
+            <span class="num">{{ n }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="scale-ends-row"><span>ממש לא</span><span>בהחלט כן</span></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">
+          מה הערך המשמעותי ביותר שאת מקבלת מבריאה?<br>
+          ומה היה עוזר לך להרגיש שהתהליך מדויק יותר?
+        </label>
+        <textarea name="biggest_value" rows="4"
+                  placeholder="כתבי בחופשיות — זה מאוד עוזר לנו להשתפר עבורך..."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">שלחי את הרפלקציה ✓</button>
+
+  </form>
+</div>
+
+<script>
+function showBadWorkshop() {
+  document.getElementById('bad-workshop').style.display = 'block';
+}
+</script>
+</body>
+</html>

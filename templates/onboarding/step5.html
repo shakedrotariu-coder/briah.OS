@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שלב 5 מתוך 5 · בריא.ה</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cream:#fff0db;--brown:#634734;--olive:#a3a877;
+--terracotta:#a3502e;--terracotta-hover:#823d22;
+--sage:#cbc6a9;--clay-100:#e8c9b3;
+--brown-100:#b89a83;--brown-200:#8c6b54;--cream-50:#fffaf0;
+--font-display:"Frank Ruhl Libre",Georgia,serif;
+--font-body:"Assistant","Heebo",sans-serif;
+}
+html{background:var(--cream)}
+body{font-family:var(--font-body);font-size:16px;color:var(--brown);-webkit-font-smoothing:antialiased;
+  background:linear-gradient(135deg,#cbc6a9 0%,#fff0db 60%);min-height:100vh;padding:2rem 1rem;}
+h3{font-family:var(--font-display);font-weight:400}
+.btn{font-family:var(--font-body);font-size:15px;font-weight:500;padding:12px 28px;border-radius:999px;cursor:pointer;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--terracotta);color:var(--cream)}
+.btn-primary:hover{background:var(--terracotta-hover)}
+.btn-full{width:100%}
+.field-group{margin-bottom:1.25rem}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--brown-200);margin-bottom:6px}
+input[type=text],textarea{
+  width:100%;padding:12px 16px;border:1px solid rgba(99,71,52,.2);border-radius:18px;
+  background:var(--cream-50);color:var(--brown);font-family:var(--font-body);font-size:15px;outline:none;resize:vertical;
+}
+input:focus,textarea:focus{border-color:rgba(163,80,46,.5);box-shadow:0 0 0 3px rgba(163,80,46,.08)}
+.progress-wrap{background:rgba(99,71,52,.1);border-radius:999px;height:4px;overflow:hidden}
+.progress-bar{height:100%;background:var(--terracotta);transition:width .3s}
+
+.step-header{margin-bottom:1.5rem;max-width:580px;margin-inline:auto}
+.step-label{font-size:12px;color:#b89a83;margin-bottom:6px}
+.onboarding-card{
+  max-width:580px;margin:0 auto;background:#fffaf0;border-radius:28px;
+  padding:2rem 2rem 2.5rem;box-shadow:0 6px 18px -8px rgba(99,71,52,.18);
+}
+.step-emoji{font-size:2rem;margin-bottom:12px;display:block}
+.step-title{font-family:"Frank Ruhl Libre",Georgia,serif;font-size:1.6rem;font-weight:400;color:#634734;margin-bottom:6px}
+
+.chips-grid{display:flex;flex-wrap:wrap;gap:8px}
+.chip{cursor:pointer}
+.chip input{display:none}
+.chip span{display:inline-block;padding:7px 14px;border-radius:999px;border:1.5px solid rgba(99,71,52,.2);background:#fffaf0;font-size:13px;color:#634734;transition:all .15s}
+.chip input:checked + span{border-color:#a3502e;background:rgba(163,80,46,.08);color:#a3502e;font-weight:500}
+.chip span:hover{border-color:#a3a877}
+
+.mashlul-card{cursor:pointer;display:block}
+.mashlul-card input{display:none}
+.mashlul-content{border:1.5px solid rgba(99,71,52,.15);border-radius:18px;padding:16px 20px;background:#fffaf0;transition:all .15s;margin-bottom:0}
+.mashlul-card input:checked + .mashlul-content{border-color:#a3502e;background:rgba(163,80,46,.05);box-shadow:0 0 0 3px rgba(163,80,46,.1)}
+.mashlul-name{font-weight:600;color:#634734;margin-bottom:4px}
+.mashlul-desc{font-size:13px;color:#8c6b54;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="step-header">
+  <div class="step-label">שלב 5 מתוך 5 · המסלול שלך</div>
+  <div class="progress-wrap">
+    <div class="progress-bar" style="width:100%;"></div>
+  </div>
+</div>
+
+<div class="onboarding-card">
+  <div class="step-emoji">✨</div>
+  <h3 class="step-title">המסלול שלך בבריאה</h3>
+
+  <form method="POST" action="/onboarding/step/5/{{ token }}">
+
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:1.5rem;">
+
+      <label class="mashlul-card">
+        <input type="radio" name="mashlul" value="ikur" required>
+        <div class="mashlul-content">
+          <div class="mashlul-name">עוגן 🌱</div>
+          <div class="mashlul-desc">כניסה עדינה — סדנאות קבוצתיות בלבד. מתאים לסקרנים שרוצים להתחיל ולהרגיש.</div>
+        </div>
+      </label>
+
+      <label class="mashlul-card">
+        <input type="radio" name="mashlul" value="tzmiha">
+        <div class="mashlul-content">
+          <div class="mashlul-name">צמיחה 🌿</div>
+          <div class="mashlul-desc">קבוצות + ליווי אישי חודשי. לאלה שרוצים עומק עם תמיכה אנושית קבועה.</div>
+        </div>
+      </label>
+
+      <label class="mashlul-card">
+        <input type="radio" name="mashlul" value="hamakata">
+        <div class="mashlul-content">
+          <div class="mashlul-name">העמקה 🌳</div>
+          <div class="mashlul-desc">קבוצות + 4 טיפולים אישיים. לאלה שמוכנים לצלול לעבודה עמוקה ומלאה.</div>
+        </div>
+      </label>
+
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">מדוע המסלול הזה מרגיש נכון לך?</label>
+      <textarea name="mashlul_reason" rows="2"
+                placeholder="כמה מילים — זה יעזור לנו להתאים לך טוב יותר..."></textarea>
+    </div>
+
+    <div class="field-group" id="therapy-goals" style="display:none;">
+      <label class="field-label">מה היית רוצה לקבל מהטיפול האישי?</label>
+      <textarea name="therapy_goals" rows="3"
+                placeholder="מטרות, תחושות, רגשות — מה שאת מקווה שיקרה..."></textarea>
+    </div>
+
+    <div class="field-group therapy-only" style="display:none;">
+      <label class="field-label">איזה סוג טיפול אישי מרגיש לך הכי מתאים?</label>
+      <div class="chips-grid">
+        {% for opt in [
+          'טיפול במגע (דיקור, שיאצו)', 'טיפול רגשי (שיח)', 'טיפול בנשימה / צלילים',
+          'טיפול דרך הקול', 'פסיכותרפיה גופנית', "אשמח שנחשוב ביחד"
+        ] %}
+        <label class="chip">
+          <input type="checkbox" name="therapy_type" value="{{ opt }}">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field-group therapy-only" style="display:none;">
+      <label class="field-label">האם יש לך העדפה למין המטפל?</label>
+      <div style="display:flex; gap:8px;">
+        {% for opt in ['מעדיפה בת', 'מעדיף בן', 'אין העדפה'] %}
+        <label class="chip">
+          <input type="radio" name="therapist_gender" value="{{ opt }}">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">
+        אם הייתה מטרה אחת שחשוב לך שהתהליך יתמוך בה — מה היא?
+      </label>
+      <input type="text" name="one_goal"
+             placeholder="משפט אחד, ישיר, שלך...">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">יש משהו נוסף שחשוב לך שנדע?</label>
+      <textarea name="anything_else" rows="2"
+                placeholder="כל מה שעולה — גם אם נראה קטן, חשוב לנו לשמוע..."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">
+      שלחי ✓ נתחיל לבנות את המסע שלך 🌿
+    </button>
+  </form>
+</div>
+
+<script>
+document.querySelectorAll('[name=mashlul]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const isPersonal = ['tzmiha','hamakata'].includes(radio.value);
+    document.querySelectorAll('.therapy-only').forEach(el => {
+      el.style.display = isPersonal ? 'block' : 'none';
+    });
+    document.getElementById('therapy-goals').style.display =
+      isPersonal ? 'block' : 'none';
+  });
+});
+</script>
+</body>
+</html>
