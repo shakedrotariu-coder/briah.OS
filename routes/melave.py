@@ -236,6 +236,7 @@ def tochnit_generate(lakoach_id):
     """Generate a full personal plan with AI from the saved intake."""
     lakoach_name = "הלקוחה"
     intake_data = _MOCK_EXTRACTION
+    onboarding_data = {}
     mashlul = "tzmiha"
 
     if supabase is not None:
@@ -254,12 +255,25 @@ def tochnit_generate(lakoach_id):
             if intake_res.data:
                 intake_data = intake_res.data[0].get("raw_summary") or intake_data
 
+            ob_res = (
+                supabase.table("onboarding_steps")
+                .select("*")
+                .eq("lakoach_id", lakoach_id)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            if ob_res.data:
+                ob = ob_res.data[0]
+                for s in range(1, 6):
+                    onboarding_data.update(ob.get(f"step{s}_data") or {})
+
             profile = supabase.table("lakoach_profiles").select("mashlul").eq("user_id", lakoach_id).single().execute().data
             mashlul = profile.get("mashlul", mashlul) if profile else mashlul
         except Exception:
             logger.exception("Failed to load intake/profile for tochnit generation, using mock data for %s", lakoach_id)
 
-    result = build_tochnit(intake_data, lakoach_name, mashlul)
+    result = build_tochnit(intake_data, lakoach_name, mashlul, onboarding_data)
     return jsonify({"success": True, "data": result})
 
 

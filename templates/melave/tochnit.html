@@ -2,10 +2,48 @@
 {% block title %}תוכנית אישית — {{ lakoach.full_name }}{% endblock %}
 
 {% block content %}
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(99,71,52,.15);
+  border-top-color: #a3502e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+.plan-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #a3502e; color: #fff0db;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0; font-weight: 600;
+}
+.plan-challenges-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+@media (max-width: 600px) { .plan-challenges-grid { grid-template-columns: 1fr; } }
+</style>
+
 <div class="flex-between mb-3">
   <h2>תוכנית אישית — {{ lakoach.full_name }}</h2>
-  <button type="button" id="generate-btn" class="btn btn-primary">בנה תוכנית עם AI ✨</button>
+  <button type="button" id="generate-btn" class="btn btn-primary" onclick="generatePlan()">בנה תוכנית עם AI ✨</button>
 </div>
+
+<!-- Loading state -->
+<div id="loading-state" style="display:none; text-align:center; padding:2.5rem; background:rgba(163,168,119,.12); border-radius:18px; margin-bottom:1.5rem;">
+  <div class="spinner"></div>
+  <p style="color:#634734; font-size:15px; margin:0;">מייצרת תוכנית אישית מלאה... זה עשוי לקחת כ-30 שניות</p>
+  <p style="color:#b89a83; font-size:13px; margin-top:6px;">ה-AI קורא את כל המידע הזמין ובונה תוכנית מותאמת אישית</p>
+</div>
+
+<!-- Error state -->
+<div id="error-state" style="display:none; padding:1.5rem; background:rgba(163,80,46,.08); border:1px solid rgba(163,80,46,.2); border-radius:18px; margin-bottom:1.5rem; text-align:center;">
+  <p style="color:#a3502e; font-size:15px; margin-bottom:12px;">⚠ שגיאה ביצירת התוכנית. בדקי את חיבור ה-API ונסי שוב.</p>
+  <button type="button" onclick="generatePlan()" class="btn btn-primary">נסי שוב</button>
+</div>
+
+<!-- Rich plan preview — rendered by JS after generation -->
+<div id="plan-preview" style="display:none; margin-bottom:2rem;"></div>
 
 <div id="generate-status" class="flash flash-info" style="display:none;"></div>
 
@@ -78,8 +116,8 @@
 <script>
   function addActivityRow(values) {
     values = values || {};
-    const list = document.getElementById('activities-list');
-    const row = document.createElement('div');
+    var list = document.getElementById('activities-list');
+    var row = document.createElement('div');
     row.className = 'grid-4 mb-2';
     row.innerHTML =
       '<input type="text" class="act-name" placeholder="שם פעילות" value="' + (values.name || '') + '">' +
@@ -90,8 +128,8 @@
   }
 
   function syncPaaluyot() {
-    const rows = document.querySelectorAll('#activities-list > div.grid-4:not(:first-child)');
-    const data = Array.from(rows).map(function (row) {
+    var rows = document.querySelectorAll('#activities-list > div.grid-4:not(:first-child)');
+    var data = Array.from(rows).map(function (row) {
       return {
         name: row.querySelector('.act-name').value,
         type: row.querySelector('.act-type').value,
@@ -104,22 +142,35 @@
 
   document.getElementById('tochnit-form').addEventListener('submit', syncPaaluyot);
 
-  document.getElementById('generate-btn').addEventListener('click', function () {
-    const status = document.getElementById('generate-status');
-    status.style.display = 'block';
-    status.textContent = 'ה-AI בונה תוכנית אישית...';
+  function generatePlan() {
+    var btn = document.getElementById('generate-btn');
+    btn.disabled = true;
+    btn.textContent = 'מייצרת...';
+    document.getElementById('loading-state').style.display = 'block';
+    document.getElementById('error-state').style.display = 'none';
+    document.getElementById('plan-preview').style.display = 'none';
+    document.getElementById('generate-status').style.display = 'none';
 
     fetch('/melave/tochnit/{{ lakoach.id }}/generate', { method: 'POST' })
       .then(function (res) { return res.json(); })
       .then(function (res) {
-        const data = res.data || {};
-        status.textContent = 'התוכנית נבנתה בהצלחה ✓';
+        document.getElementById('loading-state').style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'בנה תוכנית עם AI ✨';
+
+        if (!res.success) throw new Error(res.error || 'failed');
+
+        var data = res.data || {};
+
+        renderPlanPreview(data);
 
         [1, 2, 3].forEach(function (i) {
-          const axis = data['tzir_' + i];
+          var axis = data['tzir_' + i];
           if (!axis) return;
-          document.getElementById('tzir-' + i + '-select').value = axis.name;
-          document.getElementById('tzir-' + i + '-text').value = axis.hesber || '';
+          var sel = document.getElementById('tzir-' + i + '-select');
+          var txt = document.getElementById('tzir-' + i + '-text');
+          if (sel) sel.value = axis.name;
+          if (txt) txt.value = axis.hesber || '';
         });
 
         document.getElementById('activities-list').innerHTML =
@@ -129,10 +180,93 @@
         if (data.mikhtav_ishishi) {
           document.getElementById('personal-letter').value = data.mikhtav_ishishi;
         }
+
+        var status = document.getElementById('generate-status');
+        status.style.display = 'block';
+        status.textContent = 'התוכנית נבנתה בהצלחה ✓';
       })
       .catch(function () {
-        status.textContent = 'שגיאה ביצירת התוכנית — נסו שוב';
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'בנה תוכנית עם AI ✨';
       });
-  });
+  }
+
+  function renderPlanPreview(data) {
+    var panel = document.getElementById('plan-preview');
+
+    function esc(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function card(title, body) {
+      return '<div class="card mb-2"><div class="section-title">' + title + '</div>' + body + '</div>';
+    }
+
+    function list(items) {
+      if (!items || !items.length) return '';
+      return '<ul style="padding-right:1.4rem; margin:0;">' +
+        items.map(function (item) {
+          return '<li style="margin-bottom:6px; font-size:14px; line-height:1.65;">' + esc(item) + '</li>';
+        }).join('') + '</ul>';
+    }
+
+    var html = '';
+
+    if (data.executive_summary) {
+      html += '<div style="background:rgba(163,80,46,.07); border:1px solid rgba(163,80,46,.18); border-radius:18px; padding:1.5rem; margin-bottom:1.25rem;">' +
+        '<div style="font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:#b89a83; margin-bottom:8px;">תוכנית אישית — מוכנה</div>' +
+        '<p style="font-size:15px; color:#634734; line-height:1.75; margin:0;">' + esc(data.executive_summary) + '</p>' +
+        '</div>';
+    }
+
+    if (data.main_objectives && data.main_objectives.length) {
+      html += card('מטרות מרכזיות', list(data.main_objectives));
+    }
+
+    if (data.action_plan) {
+      html += card('תוכנית הפעולה',
+        '<p style="font-size:14px; line-height:1.75; margin:0;">' + esc(data.action_plan) + '</p>');
+    }
+
+    if (data.action_steps && data.action_steps.length) {
+      var stepsHtml = data.action_steps.map(function (s, i) {
+        return '<div style="display:flex; gap:12px; margin-bottom:14px; align-items:flex-start;">' +
+          '<div class="plan-step-num">' + (i + 1) + '</div>' +
+          '<div><div style="font-weight:600; font-size:14px; margin-bottom:3px;">' + esc(s.step) + '</div>' +
+          '<div style="font-size:13px; color:#8c6b54; line-height:1.6;">' + esc(s.description) + '</div></div>' +
+          '</div>';
+      }).join('');
+      html += card('צעדי הפעולה', stepsHtml);
+    }
+
+    if (data.recommendations && data.recommendations.length) {
+      html += card('המלצות אישיות', list(data.recommendations));
+    }
+
+    if ((data.challenges && data.challenges.length) || (data.solutions && data.solutions.length)) {
+      var challengeHtml = '<div class="plan-challenges-grid">' +
+        '<div><div style="font-weight:600; font-size:13px; color:#a3502e; margin-bottom:8px;">אתגרים צפויים</div>' + list(data.challenges || []) + '</div>' +
+        '<div><div style="font-weight:600; font-size:13px; color:#639922; margin-bottom:8px;">פתרונות מוצעים</div>' + list(data.solutions || []) + '</div>' +
+        '</div>';
+      html += card('אתגרים ופתרונות', challengeHtml);
+    }
+
+    if (data.milestones && data.milestones.length) {
+      html += card('אבני דרך', list(data.milestones));
+    }
+
+    if (data.final_summary) {
+      html += '<div style="background:#634734; color:#fff0db; border-radius:18px; padding:1.5rem; margin-bottom:1rem;">' +
+        '<div style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,240,219,.45); margin-bottom:10px;">סיכום</div>' +
+        '<p style="line-height:1.8; font-size:15px; margin:0;">' + esc(data.final_summary) + '</p>' +
+        '</div>';
+    }
+
+    panel.innerHTML = html;
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 </script>
 {% endblock %}
