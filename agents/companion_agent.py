@@ -1,6 +1,6 @@
 import logging
 
-import anthropic
+from openai import OpenAI
 
 from services.supabase_client import supabase
 
@@ -23,9 +23,6 @@ def get_companion_response(lakoach_id: str, user_message: str, lakoach_name: str
         except Exception:
             logger.exception("Failed to load companion history for %s", lakoach_id)
 
-    messages = [{"role": msg["role"], "content": msg["content"]} for msg in history]
-    messages.append({"role": "user", "content": user_message})
-
     system = f"""את AI Companion של בריאה — נוכחות חמה, מקורקעת ואמפתית שמלווה את {lakoach_name} במסע הריפוי שלה.
 
 המסע של {lakoach_name}:
@@ -42,17 +39,20 @@ def get_companion_response(lakoach_id: str, user_message: str, lakoach_name: str
 - דבר/י אליה ישירות, בגוף שני נקבה
 - הטון: כמו חברה טובה שגם מבינה בריאות נפשית"""
 
+    messages = [{"role": "system", "content": system}]
+    messages += [{"role": msg["role"], "content": msg["content"]} for msg in history]
+    messages.append({"role": "user", "content": user_message})
+
     try:
-        client = anthropic.Anthropic()
-        response = client.messages.create(
-            model="claude-sonnet-4-6",
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o",
             max_tokens=500,
-            system=system,
             messages=messages,
         )
-        reply = response.content[0].text
+        reply = response.choices[0].message.content
     except Exception:
-        logger.exception("companion_agent: Claude API call failed for %s", lakoach_id)
+        logger.exception("companion_agent: OpenAI API call failed for %s", lakoach_id)
         reply = "תודה שכתבת לי. אני כאן איתך 🤍"
 
     if supabase is not None:
